@@ -1,6 +1,6 @@
 <img align="right" width="150" height="150" top="100" src="./assets/hugo.png">
 
-# subway-rs/hugo • [![ci](https://github.com/abigger87/subway-rs/actions/workflows/ci.yaml/badge.svg)](https://github.com/abigger87/subway-rs/actions/workflows/ci.yaml) ![license](https://img.shields.io/github/license/abigger87/subway-rs?label=license) ![solidity](https://img.shields.io/badge/solidity-^0.8.15-lightgrey) ![huff](https://img.shields.io/badge/huff-0.3.0-8b6c5c)
+# subway-rs/hugo • [![ci](https://github.com/abigger87/subway-rs/actions/workflows/ci.yaml/badge.svg)](https://github.com/abigger87/subway-rs/actions/workflows/ci.yaml) ![license](https://img.shields.io/badge/License-MIT-green.svg?label=license) ![crates.io](https://img.shields.io/crates/v/subway-rs)
 
 
 A highly optimized sandwich bot and related infrastructure written in pure rust.
