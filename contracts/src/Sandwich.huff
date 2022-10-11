@@ -1,0 +1,104 @@
+/// @title Sandwich
+/// @notice SPDX-License-Identifier: MIT
+/// @author asnared <https://github.com/abigger87>
+/// @notice Modern, heavily-optimized sandwich contract.
+/// @notice Adapted from libevm/subway (https://github.com/libevm/subway/blob/master/contracts/src/Sandwich.sol)
+
+// Interface
+#define function recoverERC20(address) nonpayable returns ()
+
+// Functions this contract will call
+// NOTE: __FUNC_SIG builtin calls generate the function selector bytes4 at *compile time*
+
+// bytes4 internal constant ERC20_TRANSFER_ID = 0xa9059cbb;
+#define function transfer(address, uint256) nonpayable returns ()
+// bytes4 internal constant PAIR_SWAP_ID = 0x022c0d9f;
+#define function swap(uint256, uint256, address, bytes) nonpayable returns ()
+#define function balanceOf(address) view returns (uint256)
+#define function safeTransfer(address,uint256) nonpayable returns ()
+
+// The allowed user
+// This will be overriden with the constructor flag
+// The constructor logic will need to be copied within deploy scripts
+// in order to inline the correct constants
+#define constant USER = 0x00;
+
+/// @notice Empty Constructor
+/// @notice This is purposefully defined to prevent imports with constructor overrides
+#define macro CONSTRUCTOR() = {}
+
+/// @notice Revert, but still (3, 3) wgmi I guess
+#define macro WAGMI() = takes (0) returns (0) {
+    0x03 dup1 revert
+}
+
+/// @notice Receive profits from contract
+#define macro RECOVER_ERC20() = takes (0) returns (0) {
+    0x04 calldataload                       // [token]
+
+    // Static Call token.balanceOf(address(this))
+    __FUNC_SIG(balanceOf) 0x00 mstore       // [token]
+    address 0x04 mstore                     // [token]
+
+    0x20                                    // [retSize, token]
+    0x00                                    // [retOffset, retSize, token]
+    0x24                                    // [argSize, retOffset, retSize, token]
+    dup2                                    // [argOffset, argSize, retOffset, retSize, token]
+    dup5                                    // [to, argOffset, argSize, retOffset, retSize, token]
+    gas                                     // [gas, to, argOffset, argSize, retOffset, retSize, token]
+    staticall                               // [success, token]
+
+    // Validate successful call and load balance
+    iszero error jumpi                      // [token]
+    0x00 mload                              // [balance, token]
+
+    // Call token.safeTransfer(address(this), balance)
+    __FUNC_SIG(safeTransfer) 0x00 mstore    // [balance, token]
+    address 0x04 mstore                     // [balance, token]
+    0x24 mstore                             // [token]
+
+    0x00                    // [retSize, token]
+    0x00                    // [retOffset, retSize, token]
+    0x24                    // [argSize, retOffset, retSize, token]
+    dup2                    // [argOffset, argSize, retOffset, retSize, token]
+    dup1                    // [value, argOffset, argSize, retOffset, retSize, token]
+    dup6                    // [to, value, argOffset, argSize, retOffset, retSize, token]
+    gas                     // [gas, to, value, argOffset, argSize, retOffset, retSize, token]
+    call                    // [success, token]
+
+    // Validate call success
+    iszero error jumpi                      // [token]
+
+    // Stop execution
+    stop
+
+    // Error Jump Destination
+    error:
+        WAGMI()
+
+}
+
+/// @notice The main dispatch fallback
+#define macro MAIN() = takes (0) returns (0) {
+    // Get the function selector
+    pc calldataload 0xE0 shr                            // [selector]
+
+    // If the call has no data, receive()
+    calldatasize iszero receive jumpi                   // [selector]
+
+    // Verify that the caller is the USER
+    caller [USER] eq iszero error jumpi                 // [selector]
+
+    // Now we can match on selector
+    dup1 __FUNC_SIG(recoverERC20) eq recover jumpi      // [selector]
+
+    error:
+        WAGMI()                                         // _reverts_
+
+    recover:
+        RECOVER_ERC20()                                 // _stops_
+
+    // Allows the contract to receive ether
+    receive:                                            // [selector]
+        callvalue iszero error jumpi                    // [selector]
+}

@@ -1,0 +1,11 @@
+[profile.default]
+solc_version = '0.8.15'
+auto_detect_solc = false
+optimizer = true
+optimizer_runs = 200
+ffi = true
+fuzz_runs = 1_000
+remappings = [
+    "forge-std=lib/forge-std/src/",
+    "foundry-huff=lib/foundry-huff/src/",
+]
