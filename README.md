@@ -12,16 +12,46 @@ A practical demonstration of constructing sandwich attacks with a modern stack.
 > Having highly optimized contracts is just one part of the equation, a tech stack is just as important as the contracts to execute on the opportunities.
 _Source: [libevm/subway](https://github.com/libevm/subway#subway)_
 
-Since Having 
+If having a tech stack is just as important as optimized, secure contracts, then why not use the best language available for speed, dependability, and scalability?
+
+This is Hugo: A pure-rust bot used to execute sandwich attacks on UniswapV2.
+
+Hugo is **fast**. But don't take our word for it, just check out the [benchmarks](./hugo/benches).
+
+Alongside Hugo, we have published [subway-rs](https://crate.io/crates/subway-rs): generalized, modular rust infrastructure that you may extend for your own MEV operations!
+
+Hugo's goal is to act as a low barrier of entry for rust-based MEV development - Reference source code for aspiring new searchers.
+
+This bot contains:
+
+- read from the mempool
+- decode transaction data
+- simple logging system
+- profit calculation algos
+- gas bribe calculation
+- bundle firing
+- misc
+  - doing math in JS
+  - calculating next base fee
+
+While the bot is functional, the bot logic is a very simplistic one and does not contain a lot of the features that many advance searchers have (but not including), such as:
+
+- circuit breakers
+- poison token checker
+- caching system
+- robust logging system (e.g. graphana)
+- various gas saving ALPHAs
+
+As such, this bot is intended as a piece of educational content, and not for production use.
 
 
 ### Blueprint
 
 ```ml
 .
-├─ bot — A highly optimized sandwich bot and related infrastructure written in pure rust.
+├─ bot — A highly optimized, pure rust sandwich bot.
 |  └─ ...
-└─ contracts — Contains contracts that can be used for front and back slices in a UniswapV2 sandwich attack.
+└─ contracts — UniswapV2 sandwich attack contracts.
    └─ ...
 ```
 
@@ -33,3 +63,9 @@ Since Having
 - [forge-std](https://github.com/brockelmore/forge-std)
 - [foundry-huff](https://github.com/foundry-rs/foundry-huff)
 
+
+### Contributing
+
+All contributions are welcome!
+
+Please reach out to [asnared](https://twitter.com/asnared) on twitter if you have any questions.
