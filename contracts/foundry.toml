@@ -8,4 +8,6 @@ fuzz_runs = 1_000
 remappings = [
     "forge-std=lib/forge-std/src/",
     "foundry-huff=lib/foundry-huff/src/",
+    "huffmate=lib/huffmate/src/",
 ]
+eth_rpc_url="https://eth-mainnet.g.alchemy.com/v2/RWYJ7pHUnJFxAROYqC6FfEIDRDmi7luF"

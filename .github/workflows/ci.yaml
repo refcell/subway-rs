@@ -5,7 +5,9 @@ on: [push]
 jobs:
   forge-tests:
     runs-on: ubuntu-latest
-
+    defaults:
+      run:
+        working-directory: ./contracts
     steps:
       - uses: actions/checkout@v3
         with:
@@ -21,8 +23,29 @@ jobs:
       - name: Run Tests
         run: forge test -vvv
 
+  forge-snapshot:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./contracts
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+      - name: Install deps
+        run: forge install
+      - name: Check contract sizes
+        run: forge build --sizes
+      - name: Check gas snapshots
+        run: forge snapshot --check
+
   huff-tests:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./contracts
     steps:
       - uses: actions/checkout@v3
         with:
@@ -41,11 +64,13 @@ jobs:
           with-forge-tests: false
           test-extension: ".t.huff"
 
-  scripts:
+  forge-scripts:
     strategy:
       fail-fast: true
-    name: Run Scripts
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./contracts
     steps:
       - uses: actions/checkout@v3
         with:
@@ -71,3 +96,74 @@ jobs:
           for file in script/*; do
             forge script $file -vvvv
           done
+
+  cargo-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./bot
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+      - name: Install toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+      - uses: Swatinem/rust-cache@v1
+        with:
+          cache-on-failure: true
+      - name: Install Foundry
+        uses: onbjerg/foundry-toolchain@v1
+        with:
+          version: nightly
+      - name: cargo test
+        run: cargo test --all --all-features
+
+  cargo-lint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./bot
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+      - name: Install toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          profile: minimal
+          components: rustfmt, clippy
+          override: true
+      - uses: Swatinem/rust-cache@v1
+        with:
+          cache-on-failure: true
+      - name: cargo fmt
+        run: cargo +nightly fmt --all -- --check
+      - name: cargo clippy
+        run: cargo +nightly clippy --all --all-features -- -D warnings
+
+  cargo-build:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    defaults:
+      run:
+        working-directory: ./bot
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+      - name: Install toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+      - uses: Swatinem/rust-cache@v1
+        with:
+          cache-on-failure: true
+      - name: build
+        id: build
+        continue-on-error: true
+        run: cargo +nightly build --all
+

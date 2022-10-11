@@ -1,0 +1,34 @@
+[package]
+name = "subway-rs"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "Minimal Sandwich Bot"
+authors = ["asnared <https://github.com/abigger87>"]
+repository = "https://github.com/abigger87/subway-rs"
+keywords = ["Rust", "Ethereum", "Arbitrage", "Sandwich"]
+
+[dependencies]
+serde = { version = "1.0.137", features = ["derive"] }
+serde_json = { version = "1.0.82", features = [ "raw_value" ] }
+thiserror = "1.0.31"
+reqwest = { version = "0.11.10", features = ["json", "blocking"] }
+ethers = { version = "0.17.0", features = [ "abigen" ] }
+eyre = { version = "0.6" }
+hex = "0.4.3"
+rlp = { version = "0.5.1", default-features = false }
+tracing = "0.1.36"
+futures = "0.3.23"
+anyhow = "1.0.65"
+
+[dev-dependencies]
+tracing-test = "0.2.3"
+tokio = { version = "1.0.1", features = ["rt-multi-thread", "macros"] }
+
+[[example]]
+name = "pure_arb"
+path = "examples/pure_arb.rs"
+
+[[test]]
+name = "builder"
+path = "tests/crate/builder.rs"

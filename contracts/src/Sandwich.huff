@@ -4,6 +4,9 @@
 /// @notice Modern, heavily-optimized sandwich contract.
 /// @notice Adapted from libevm/subway (https://github.com/libevm/subway/blob/master/contracts/src/Sandwich.sol)
 
+// Import
+#include "huffmate/utils/CommonErrors.huff"
+
 // Interface
 #define function recoverERC20(address) nonpayable returns ()
 
@@ -21,7 +24,7 @@
 // This will be overriden with the constructor flag
 // The constructor logic will need to be copied within deploy scripts
 // in order to inline the correct constants
-#define constant USER = 0x00;
+#define constant USER = 0x00
 
 /// @notice Empty Constructor
 /// @notice This is purposefully defined to prevent imports with constructor overrides
@@ -46,7 +49,7 @@
     dup2                                    // [argOffset, argSize, retOffset, retSize, token]
     dup5                                    // [to, argOffset, argSize, retOffset, retSize, token]
     gas                                     // [gas, to, argOffset, argSize, retOffset, retSize, token]
-    staticall                               // [success, token]
+    staticcall                              // [success, token]
 
     // Validate successful call and load balance
     iszero error jumpi                      // [token]
@@ -91,6 +94,9 @@
 
     // Now we can match on selector
     dup1 __FUNC_SIG(recoverERC20) eq recover jumpi      // [selector]
+
+    // Nothing matched, revert with a dispatch error
+    DISPATCH_ERROR(0x00)
 
     error:
         WAGMI()                                         // _reverts_
