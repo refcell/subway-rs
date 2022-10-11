@@ -3,7 +3,7 @@ name = "subway-rs"
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
-description = "Minimal Sandwich Bot"
+description = "Hugo: An Aggressive Sandwich Bot"
 authors = ["asnared <https://github.com/abigger87>"]
 repository = "https://github.com/abigger87/subway-rs"
 keywords = ["Rust", "Ethereum", "Arbitrage", "Sandwich"]
@@ -25,10 +25,10 @@ anyhow = "1.0.65"
 tracing-test = "0.2.3"
 tokio = { version = "1.0.1", features = ["rt-multi-thread", "macros"] }
 
-[[example]]
-name = "pure_arb"
-path = "examples/pure_arb.rs"
+[lib]
+name = "subway-rs"
+path = "src/lib.rs"
 
-[[test]]
-name = "builder"
-path = "tests/crate/builder.rs"
+[[bin]]
+name = "hugo"
+path = "src/hugo.rs"
