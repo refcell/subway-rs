@@ -1,10 +1,10 @@
 //! A transaction hook module
 
-use serde::{Deserialize, Serialize};
 use ethers::prelude::*;
+use serde::{Deserialize, Serialize};
 
 /// A transaction filter
-#[derive(Debug, Default, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Filter {
     /// Event logs to watch
     Event(H256),
@@ -18,8 +18,8 @@ pub enum Filter {
 }
 
 impl Filter {
-    pub fn matches(&self, tx: &Transaction) -> bool {
-
+    /// Check if the filter matches
+    pub fn matches(&self, _tx: &Transaction) -> bool {
         false
     }
 }

@@ -15,9 +15,5 @@ pub mod utils;
 
 /// Re-export a prelude
 pub mod prelude {
-    pub use super::{
-        utils::*,
-        relayer::*,
-        hook::*
-    };
+    pub use super::{hook::*, relayer::*, utils::*};
 }
