@@ -101,14 +101,12 @@ pub fn create_http_client(
 /// Construct the Uniswap V2 Pair Contract
 pub fn get_univ2_contract(
     chain_id: u64,
+    address: &Address
 ) -> Result<UniswapV2Pair<SignerMiddleware<Provider<Http>, LocalWallet>>> {
-    // Get the Uniswap V2 Pair Contract Address
-    let uni_v2_addr = get_univ2_address()?;
-
     // Create a client
     let provider = get_http_provider()?;
     let client = create_http_client(provider, chain_id)?;
 
     // Return the contract
-    Ok(UniswapV2Pair::new(uni_v2_addr, client))
+    Ok(UniswapV2Pair::new(*address, client))
 }

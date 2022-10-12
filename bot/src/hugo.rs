@@ -2,7 +2,7 @@ use ethers::prelude::*;
 use eyre::Result;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use subway_rs::{abi, banner, uniswap, utils};
+use subway_rs::{abi, banner, uniswap, numeric, utils};
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -94,6 +94,13 @@ async fn main() -> Result<()> {
             continue;
         }
 
+        // Get the min recv for token directly after WETH
+        let user_min_recv = if let Ok(m) = uniswap::get_univ2_exact_weth_token_min_recv(&decoded.amount_out_min, &decoded.path).await { m } else {
+            tracing::debug!("Failed to get min recv for token, skipping...");
+            continue;
+        };
+        let user_amount_in = tx.value;
+
         tracing::info!(
             "[DETECTED] Potential sandwichable transaction: {:#?}",
             decoded
@@ -103,7 +110,9 @@ async fn main() -> Result<()> {
         // NOTE: Token A will always be WETH here since the call is decoded as a SwapExactETHForTokensCall
         let token_a = decoded.path[0];
         let token_b = decoded.path[1];
-        let _pair_to_sandwich =
+
+        // Get the pair to sandwich
+        let pair_to_sandwich =
             if let Ok(p) = uniswap::get_uniswap_v2_pair_address(&token_a, &token_b) {
                 p
             } else {
@@ -114,18 +123,36 @@ async fn main() -> Result<()> {
                 );
                 continue;
             };
+        println!("Got pair to swandwich: {:?}", pair_to_sandwich);
 
-        // const [reserveWeth, reserveToken] = await getUniv2Reserve(
-        //     pairToSandwich,
-        //     weth,
-        //     token
-        // );
-        // const optimalWethIn = calcSandwichOptimalIn(
-        //     userAmountIn,
-        //     userMinRecv,
-        //     reserveWeth,
-        //     reserveToken
-        // );
+        // Get the token reserves
+        let (mut token_a_reserves, mut token_b_reserves) = if let Ok(r) = uniswap::get_uniswap_v2_reserves(&pair_to_sandwich).await { r } else {
+            tracing::debug!(
+                "Failed to get uniswap v2 reserves for pair {:?}, skipping...",
+                pair_to_sandwich
+            );
+            continue;
+        };
+        println!(
+            "Got reserves for pair: [{:?}, {:?}]",
+            token_a_reserves, token_b_reserves
+        );
+
+        // Swap the amounts if tokens are not in order
+        if token_a > token_b {
+            (token_a_reserves, token_b_reserves) = (token_b_reserves, token_a_reserves);
+        }
+
+        // Caclulate the optimal swap amount
+        println!("Calculating optimal swap amount...");
+        let optimal_weth_in = numeric::calculate_sandwich_optimal_in(
+            user_amount_in,
+            user_min_recv,
+            token_a_reserves,
+            token_b_reserves,
+        );
+        println!("Optimal swap amount: {:?}", optimal_weth_in);
+
     }
 
     Ok(())

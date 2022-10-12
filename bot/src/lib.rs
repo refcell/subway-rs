@@ -7,9 +7,6 @@
 /// A Relayer
 pub mod relayer;
 
-/// A Hook to be called on new transactions
-pub mod hook;
-
 /// Common Utilities
 pub mod utils;
 
@@ -22,7 +19,10 @@ pub mod banner;
 /// Uniswap Utilities
 pub mod uniswap;
 
+/// Numeric Operations
+pub mod numeric;
+
 /// Re-export a prelude
 pub mod prelude {
-    pub use super::{abi::*, banner::*, hook::*, relayer::*, uniswap::*, utils::*};
+    pub use super::{abi::*, banner::*, relayer::*, uniswap::*, numeric::*, utils::*};
 }

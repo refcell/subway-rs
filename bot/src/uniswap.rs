@@ -6,6 +6,13 @@ use hex::FromHex;
 
 use crate::utils::get_univ2_factory_address;
 
+/// Sorts two tokens
+pub fn sort_tokens(a: &mut Address, b: &mut Address) {
+    if a > b {
+        std::mem::swap(a, b);
+    }
+}
+
 /// Gets the Uniswap V2 Pair Contract Address given two token addresses
 pub fn get_uniswap_v2_pair_address(a: &Address, b: &Address) -> Result<Address> {
     // Sort the tokens
@@ -31,4 +38,75 @@ pub fn get_uniswap_v2_pair_address(a: &Address, b: &Address) -> Result<Address> 
         salt,
         Bytes::from(init_code),
     ))
+}
+
+
+/// Get the Uniswap V2 Reserves for a give token pair
+pub async fn get_uniswap_v2_reserves(pair: &Address) -> Result<(U256, U256)> {
+    let contract = crate::utils::get_univ2_contract(1, pair)?;
+    let (token_a_reserves, token_b_reserves, _last_time_updated) = contract.get_reserves().call().await?;
+    Ok((U256::from(token_a_reserves), U256::from(token_b_reserves)))
+}
+
+/// Returns how much output if we supply in
+/// Follows: Uniswap v2; x * y = k formula
+pub fn get_univ2_data_given_in(a_in: &U256, a_reserves: &U256, b_reserves: &U256) -> (U256, U256, U256) {
+    // Calculate the output
+    let a_in_with_fee = a_in * 997;
+    let numerator = a_in_with_fee * b_reserves;
+    let denominator = a_reserves * 1000 + a_in_with_fee;
+    let b_out = numerator / denominator;
+
+    // Calculate the new b reserves, accounting for underflow
+    let new_b_reserves = b_reserves.checked_sub(b_out).unwrap_or(U256::one());
+
+    // Calculate the new a reserves, accounting for overflow
+    let new_a_reserves = a_reserves.checked_add(*a_in).unwrap_or(U256::MAX);
+
+    // Return
+    (b_out, new_a_reserves, new_b_reserves)
+}
+
+/// Returns how much output if we supply out
+/// Follows: Uniswap v2; x * y = k formula
+pub fn get_univ2_data_given_out(b_out: &U256, a_reserves: &U256, b_reserves: &U256) -> (U256, U256, U256) {
+    // Calculate the new b reserves, accounting for underflow
+    let new_b_reserves = b_reserves.checked_sub(*b_out).unwrap_or(U256::one());
+
+    // Calculate the amount in
+    let numerator = a_reserves * b_out * 1000;
+    let denominator = new_b_reserves * 997;
+    let a_in = numerator / denominator + 1;
+
+    // Calculate the new a reserves, accounting for overflow
+    let new_a_reserves = a_reserves.checked_add(a_in).unwrap_or(U256::MAX);
+
+    // Return
+    (a_in, new_a_reserves, new_b_reserves)
+}
+
+/// Compute how much the user is willing to accept as a minimum output
+pub async fn get_univ2_exact_weth_token_min_recv(final_min_recv: &U256, path: &Vec<Address>) -> Result<U256> {
+    let mut user_min_recv = *final_min_recv;
+
+    // Computes the lowest amount of tokens after weth
+    let mut i = path.len() - 1;
+    while i > 1 {
+        // Get the token pair address
+        let from_token = path[i - 1];
+        let to_token = path[i];
+        let pair = get_uniswap_v2_pair_address(&from_token, &to_token)?;
+
+        // Get the token pair reserves
+        let (from_reserves, to_reserves) = get_uniswap_v2_reserves(&pair).await?;
+
+        // Get the new reserve data
+        (user_min_recv, _, _) = get_univ2_data_given_out(&user_min_recv, &from_reserves, &to_reserves);
+
+        // Decrement and iterate
+        i -= 1;
+    }
+
+    // Return the final amount
+    Ok(user_min_recv)
 }
