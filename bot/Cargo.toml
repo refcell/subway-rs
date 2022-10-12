@@ -13,17 +13,18 @@ serde = { version = "1.0.137", features = ["derive"] }
 serde_json = { version = "1.0.82", features = [ "raw_value" ] }
 thiserror = "1.0.31"
 reqwest = { version = "0.11.10", features = ["json", "blocking"] }
-ethers = { version = "0.17.0", features = [ "abigen", "ws" ] }
+ethers = { version = "0.17.0", features = [ "abigen", "ws", "rustls" ] }
 eyre = { version = "0.6" }
 hex = "0.4.3"
 rlp = { version = "0.5.1", default-features = false }
 tracing = "0.1.36"
 futures = "0.3.23"
-anyhow = "1.0.65"
+tokio = { version = "1.0.1", features = ["rt-multi-thread", "macros"] }
+ansi_term = "0.12.1"
+yansi = "0.5.1"
 
 [dev-dependencies]
 tracing-test = "0.2.3"
-tokio = { version = "1.0.1", features = ["rt-multi-thread", "macros"] }
 
 [lib]
 name = "subway_rs"

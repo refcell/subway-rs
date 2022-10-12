@@ -1,11 +1,11 @@
-#![allow(missing_docs)]
+//! A module containing common utilities
 
 use std::{str::FromStr, sync::Arc};
 
 use ethers::prelude::*;
 use eyre::Result;
 
-abigen!(UniswapV2Pair, "src/abi/IUniswapV2Pair.json");
+use crate::abi::UniswapV2Pair;
 
 /// Read environment variables
 pub fn read_env_vars() -> Result<Vec<(String, String)>> {
@@ -29,6 +29,12 @@ pub fn read_env_vars() -> Result<Vec<(String, String)>> {
 /// Returns the Uniswap V2 Pair Contract Address
 pub fn get_univ2_address() -> Result<Address> {
     Address::from_str("0x7a250d5630b4cf539739df2c5dacb4c659f2488d")
+        .map_err(|_| eyre::eyre!("Invalid address"))
+}
+
+/// Returns the Uniswap V2 Factory Address
+pub fn get_univ2_factory_address() -> Result<Address> {
+    Address::from_str("0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f")
         .map_err(|_| eyre::eyre!("Invalid address"))
 }
 
@@ -64,7 +70,13 @@ pub async fn get_ws_provider() -> Result<Provider<Ws>> {
         .map_err(|_| eyre::eyre!("Required environment variable \"RPC_URL_WSS\" not set"))?;
     Provider::<Ws>::connect(&url)
         .await
-        .map_err(|_| eyre::eyre!("Invalid RPC URL"))
+        .map_err(|e| eyre::eyre!("RPC Connection Error: {:?}", e))
+}
+
+/// Create Websocket Client
+pub async fn create_websocket_client() -> Result<Arc<Provider<Ws>>> {
+    let client = get_ws_provider().await?;
+    Ok(Arc::new(client))
 }
 
 /// Construct the searcher wallet
@@ -76,6 +88,16 @@ pub fn get_searcher_wallet() -> Result<LocalWallet> {
         .map_err(|e| eyre::eyre!("Failed to parse private key: {:?}", e))
 }
 
+/// Creates a client from a provider
+pub fn create_http_client(
+    p: Provider<Http>,
+    chain_id: u64,
+) -> Result<Arc<SignerMiddleware<Provider<Http>, LocalWallet>>> {
+    let wallet = get_searcher_wallet()?;
+    let client = SignerMiddleware::new(p, wallet.with_chain_id(chain_id));
+    Ok(Arc::new(client))
+}
+
 /// Construct the Uniswap V2 Pair Contract
 pub fn get_univ2_contract(
     chain_id: u64,
@@ -85,9 +107,7 @@ pub fn get_univ2_contract(
 
     // Create a client
     let provider = get_http_provider()?;
-    let wallet = get_searcher_wallet()?;
-    let client = SignerMiddleware::new(provider, wallet.with_chain_id(chain_id));
-    let client = Arc::new(client);
+    let client = create_http_client(provider, chain_id)?;
 
     // Return the contract
     Ok(UniswapV2Pair::new(uni_v2_addr, client))
