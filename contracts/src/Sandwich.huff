@@ -4,9 +4,6 @@
 /// @notice Modern, heavily-optimized sandwich contract.
 /// @notice Adapted from libevm/subway (https://github.com/libevm/subway/blob/master/contracts/src/Sandwich.sol)
 
-// Import
-#include "huffmate/utils/CommonErrors.huff"
-
 // Interface
 #define function recoverERC20(address) nonpayable returns ()
 
@@ -56,7 +53,7 @@
     0x00 mload                              // [balance, token]
 
     // Call token.safeTransfer(address(this), balance)
-    __FUNC_SIG(safeTransfer) 0x00 mstore    // [balance, token]
+    __FUNC_SIG(safeTransfer) 0xe0 shl 0x00 mstore    // [balance, token]
     address 0x04 mstore                     // [balance, token]
     0x24 mstore                             // [token]
 
@@ -84,14 +81,14 @@
 /// @notice Executes a sandwich attack
 #define macro EXECUTE_SANDWICH() = takes (0) returns (0) {
     // Unpack the calldata
-    0x04 calldataload                       // [token] - bytes 20
-    0x14 calldataload                       // [pair, token] - bytes 20
-    0x28 calldataload                       // [amountIn, pair, token] - uint128
-    0x38 calldataload                       // [amountOut, amountIn, pair, token] - uint128
-    0x48 calldataload                       // [tokenOutNo, amountOut, amountIn, pair, token] - uint8
+    0x00 calldataload 0x60 shr              // [token] - bytes 20
+    0x14 calldataload 0x60 shr              // [pair, token] - bytes 20
+    0x28 calldataload 0x80 shr              // [amountIn, pair, token] - uint128
+    0x38 calldataload 0x80 shr              // [amountOut, amountIn, pair, token] - uint128
+    0x48 calldataload 0xE8 shr              // [tokenOutNo, amountOut, amountIn, pair, token] - uint8
 
     // Call token.transfer(pair, amountIn)
-    __FUNC_SIG(transfer) 0x00 mstore        // [tokenOutNo, amountOut, amountIn, pair, token]
+    __FUNC_SIG(transfer) 0xe0 shl 0x00 mstore        // [tokenOutNo, amountOut, amountIn, pair, token]
     dup4 0x04 mstore                        // [tokenOutNo, amountOut, amountIn, pair, token]
     dup3 0x24 mstore                        // [tokenOutNo, amountOut, amountIn, pair, token]
 
@@ -108,7 +105,7 @@
     iszero ngmi jumpi       // [tokenOutNo, amountOut, amountIn, pair, token]
 
     // Call pair.swap(tokenOutNo == 0 ? amountOut : 0, tokenOutNo == 1 ? amountOut : 0, address(this), new bytes(0))
-    __FUNC_SIG(swap) 0x00 mstore            // [tokenOutNo, amountOut, amountIn, pair, token]
+    __FUNC_SIG(swap) 0xe0 shl 0x00 mstore   // [tokenOutNo, amountOut, amountIn, pair, token]
     iszero _Zero_Token_out jumpi            // [amountOut, amountIn, pair, token]
         0x00 0x04 mstore                    // [amountOut, amountIn, pair, token]
         0x24 mstore                         // [amountIn, pair, token]
@@ -124,11 +121,10 @@
     // Empty bytes memory should point to the next word
     0x84 0x64 mstore                        // [amountIn, pair, token]
 
-
     // Execute the call
     0x00                    // [retSize, amountIn, pair, token]
     0x00                    // [retOffset, retSize, amountIn, pair, token]
-    0xa4                    // [argSize, retOffset, retSize, amountIn, pair, token]
+    0xc4                    // [argSize, retOffset, retSize, amountIn, pair, token]
     dup2                    // [argOffset, argSize, retOffset, retSize, amountIn, pair, token]
     dup1                    // [value, argOffset, argSize, retOffset, retSize, amountIn, pair, token]
     dup7                    // [to, value, argOffset, argSize, retOffset, retSize, amountIn, pair, token]
@@ -160,9 +156,6 @@
     dup1 __FUNC_SIG(recoverERC20) eq recover jumpi      // [selector]
 
     EXECUTE_SANDWICH()
-
-    // Nothing matched, revert with a dispatch error
-    DISPATCH_ERROR(0x00)
 
     error:
         WAGMI()                                         // _reverts_
