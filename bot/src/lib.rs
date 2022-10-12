@@ -7,7 +7,17 @@
 /// A Relayer
 pub mod relayer;
 
+/// A Hook to be called on new transactions
+pub mod hook;
+
+/// Common Utilities
+pub mod utils;
+
 /// Re-export a prelude
 pub mod prelude {
-    pub use super::{relayer::*};
+    pub use super::{
+        utils::*,
+        relayer::*,
+        hook::*
+    };
 }

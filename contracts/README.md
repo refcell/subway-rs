@@ -16,13 +16,16 @@ A highly optimized [huff](https://github.com/huff-language) contract that can be
 
 ### Gas Usage
 
-![](https://i.imgur.com/5AQQbns.png)
+As shown below, the subway-rs [Huff Contract](./src/Sandwich.huff) offers gas improvements of up to **9 times** the original subway's [most optimized contract](https://github.com/libevm/subway/blob/master/contracts/src/Sandwich.yulp).
 
-| Single Swap                       | Gas Used   |
-| --------------------------------- | ---------- |
-| Univ2 Router                      | todo!()    |
-| Solidity Inline Assembly Contract | todo!()    |
-| Yulp Contracts                    | todo!()    |
+![](./assets/gas.png)
+
+| Single Swap                       | Gas Used | Who        |
+| --------------------------------- | -------- | ---------- |
+| Univ2 Router                      | 109809   | uniswap    |
+| Solidity Inline Assembly Contract | 92422    | subway     |
+| Yulp Contracts                    | 92234    | subway     |
+| Huff Contract                     | 10719    | subway-rs  |
 
 
 ### Usage

@@ -84,18 +84,16 @@ contract SandwichTest is Test {
         vm.stopPrank();
     }
 
-    // TODO: Add assertion back once implemented!
     function testSandwichFrontslice() public {
         bytes memory payload = getSandwichPayload();
         vm.startPrank(USER);
         uint256 _before = gasleft();
         (bool s, ) = address(sandwich).call(payload);
         uint256 _after = gasleft();
-        // assertTrue(s);
+        assertTrue(s);
         console2.log("Gas used: ", (_before - _after));
         vm.stopPrank();
     }
-
 
     // Helper methods
 
