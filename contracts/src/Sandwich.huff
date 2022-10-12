@@ -155,7 +155,7 @@
     // Now we can match on selector
     dup1 __FUNC_SIG(recoverERC20) eq recover jumpi      // [selector]
 
-    EXECUTE_SANDWICH()
+    EXECUTE_SANDWICH()                                  // _stops_
 
     error:
         WAGMI()                                         // _reverts_
@@ -166,4 +166,5 @@
     // Allows the contract to receive ether
     receive:                                            // [selector]
         callvalue iszero error jumpi                    // [selector]
+        stop
 }
