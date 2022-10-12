@@ -34,6 +34,10 @@ jobs:
         uses: foundry-rs/foundry-toolchain@v1
         with:
           version: nightly
+      - name: Install Huff
+        uses: huff-language/huff-toolchain@v2
+        with:
+          version: nightly
       - name: Install deps
         run: forge install
       - name: Check contract sizes
