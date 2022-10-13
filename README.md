@@ -31,7 +31,7 @@ Hugo is able to:
 
 ### Future Improvements for Hugo
 
-Although the bot functions, it is simplistic and _certainly_ not competitive. Accept that advanced searchers to already be executing far beyond Hugo's capabilities. That being said, the following is low hanging fruit to take Hugo to the next level:
+Although the bot functions, it is simplistic and _certainly_ not competitive. Accept that advanced searchers to already be executing far beyond Hugo's capabilities. That being said, below is a non-exhaustive list of low hanging fruit to further Hugo + subway-rs along.
 
 - [ ] Deployment logic for contracts
 - [ ] Circuit Breakers
@@ -42,8 +42,10 @@ Although the bot functions, it is simplistic and _certainly_ not competitive. Ac
 - [ ] Zero-cost Gas Savings :eyes:
 - [ ] Real-time Benchmarking
 - [ ] Improved Parallelization
+- [ ] Persistent Execution Storage and Tracking (eg: psql, a rekt threshold, P&L)
+- [ ] Refactored Wallet Management
 
-Please please be warned, this bot is intended as a piece of educational content, and not for production use. It has not been run in production, and should not be used in such an environment. If you are looking for a "quick buck", turn away now.
+Again, please be aware, this bot is intended as a piece of educational content, and not for production use. It has not been run in production, and should not be used in such an environment. 
 
 
 ### Blueprint
