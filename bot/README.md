@@ -30,7 +30,7 @@ Required Preparation:
 2. Deploy a sandwich contract from the [contracts](../contracts/) directory, or re-use an existing one.
 3. Create a `.env` file and set the required variables, referencing the below environment variables. (NOTE: we've added `.env` and `.env.prod` to the `.gitignore` file, so you don't accidentally commit your secrets to the repo. All other secret commits are on you. Exercise caution.)
 
-```
+```ignore
 RPC_URL=http://127.0.0.1:8545
 RPC_URL_WSS=ws://127.0.0.1:8546
 PRIVATE_KEY=0000000000000000000000000000000000000000000000000000000000000001

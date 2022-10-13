@@ -36,12 +36,15 @@ Hugo is able to:
 
 Although the bot functions, it is simplistic and _certainly_ not competitive. Accept that advanced searchers to already be executing far beyond Hugo's capabilities. That being said, the following is low hanging fruit to take Hugo to the next level:
 
+- [ ] Deployment logic for contracts
 - [ ] Circuit Breakers
 - [ ] Alerting (see: https://github.com/DeGatchi/mev-template-rs)
 - [ ] Poision Token Filtering
 - [ ] Caching + Memoization
 - [ ] Enhanced Logging Filters
 - [ ] Zero-cost Gas Savings :eyes:
+- [ ] Real-time Benchmarking
+- [ ] Improved Parallelization
 
 Please please be warned, this bot is intended as a piece of educational content, and not for production use. It has not been run in production, and should not be used in such an environment. If you are looking for a "quick buck", turn away now.
 
