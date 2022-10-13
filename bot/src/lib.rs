@@ -24,5 +24,5 @@ pub mod numeric;
 
 /// Re-export a prelude
 pub mod prelude {
-    pub use super::{abi::*, banner::*, relayer::*, uniswap::*, numeric::*, utils::*};
+    pub use super::{abi::*, banner::*, numeric::*, relayer::*, uniswap::*, utils::*};
 }

@@ -2,10 +2,41 @@
 
 use std::{str::FromStr, sync::Arc};
 
-use ethers::prelude::*;
+use ethers::{prelude::*, types::transaction::eip2718::TypedTransaction};
 use eyre::Result;
+use rand::Rng;
 
 use crate::abi::UniswapV2Pair;
+
+/// Get Raw Transaction
+pub fn get_raw_transaction(tx: &Transaction) -> TypedTransaction {
+    let typed_transaction: TypedTransaction = tx.into();
+    typed_transaction
+}
+
+/// Calculate the next block base fee
+pub fn calculate_next_block_base_fee(block: Block<TxHash>) -> eyre::Result<U256> {
+    // Get the block base fee per gas
+    let base_fee = block
+        .base_fee_per_gas
+        .ok_or(eyre::eyre!("Block missing base fee per gas"))?;
+
+    // Get the mount of gas used in the block
+    let gas_used = block.gas_used;
+
+    // Get the target gas used
+    let target_gas_used = block.gas_limit / 2;
+
+    // Calculate the difference
+    let delta = gas_used - target_gas_used;
+
+    // Calculate the new base fee
+    let new_base_fee = base_fee + ((base_fee * delta) / target_gas_used) / U256::from(8u64);
+
+    // Add a random seed so it hashes differently
+    let seed = rand::thread_rng().gen_range(0..9);
+    Ok(new_base_fee + seed)
+}
 
 /// Read environment variables
 pub fn read_env_vars() -> Result<Vec<(String, String)>> {
@@ -88,6 +119,16 @@ pub fn get_searcher_wallet() -> Result<LocalWallet> {
         .map_err(|e| eyre::eyre!("Failed to parse private key: {:?}", e))
 }
 
+/// Construct the bundle signer
+/// This is your flashbots searcher identity
+pub fn get_bundle_signer() -> Result<LocalWallet> {
+    let private_key = std::env::var("FLASHBOTS_AUTH_KEY")
+        .map_err(|_| eyre::eyre!("Required environment variable \"FLASHBOTS_AUTH_KEY\" not set"))?;
+    private_key
+        .parse::<LocalWallet>()
+        .map_err(|e| eyre::eyre!("Failed to parse flashbots signer: {:?}", e))
+}
+
 /// Creates a client from a provider
 pub fn create_http_client(
     p: Provider<Http>,
@@ -101,7 +142,7 @@ pub fn create_http_client(
 /// Construct the Uniswap V2 Pair Contract
 pub fn get_univ2_contract(
     chain_id: u64,
-    address: &Address
+    address: &Address,
 ) -> Result<UniswapV2Pair<SignerMiddleware<Provider<Http>, LocalWallet>>> {
     // Create a client
     let provider = get_http_provider()?;

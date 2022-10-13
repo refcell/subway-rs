@@ -40,17 +40,21 @@ pub fn get_uniswap_v2_pair_address(a: &Address, b: &Address) -> Result<Address> 
     ))
 }
 
-
 /// Get the Uniswap V2 Reserves for a give token pair
 pub async fn get_uniswap_v2_reserves(pair: &Address) -> Result<(U256, U256)> {
     let contract = crate::utils::get_univ2_contract(1, pair)?;
-    let (token_a_reserves, token_b_reserves, _last_time_updated) = contract.get_reserves().call().await?;
+    let (token_a_reserves, token_b_reserves, _last_time_updated) =
+        contract.get_reserves().call().await?;
     Ok((U256::from(token_a_reserves), U256::from(token_b_reserves)))
 }
 
 /// Returns how much output if we supply in
 /// Follows: Uniswap v2; x * y = k formula
-pub fn get_univ2_data_given_in(a_in: &U256, a_reserves: &U256, b_reserves: &U256) -> (U256, U256, U256) {
+pub fn get_univ2_data_given_in(
+    a_in: &U256,
+    a_reserves: &U256,
+    b_reserves: &U256,
+) -> (U256, U256, U256) {
     // Calculate the output
     let a_in_with_fee = a_in * 997;
     let numerator = a_in_with_fee * b_reserves;
@@ -69,7 +73,11 @@ pub fn get_univ2_data_given_in(a_in: &U256, a_reserves: &U256, b_reserves: &U256
 
 /// Returns how much output if we supply out
 /// Follows: Uniswap v2; x * y = k formula
-pub fn get_univ2_data_given_out(b_out: &U256, a_reserves: &U256, b_reserves: &U256) -> (U256, U256, U256) {
+pub fn get_univ2_data_given_out(
+    b_out: &U256,
+    a_reserves: &U256,
+    b_reserves: &U256,
+) -> (U256, U256, U256) {
     // Calculate the new b reserves, accounting for underflow
     let new_b_reserves = b_reserves.checked_sub(*b_out).unwrap_or(U256::one());
 
@@ -86,7 +94,10 @@ pub fn get_univ2_data_given_out(b_out: &U256, a_reserves: &U256, b_reserves: &U2
 }
 
 /// Compute how much the user is willing to accept as a minimum output
-pub async fn get_univ2_exact_weth_token_min_recv(final_min_recv: &U256, path: &Vec<Address>) -> Result<U256> {
+pub async fn get_univ2_exact_weth_token_min_recv(
+    final_min_recv: &U256,
+    path: &Vec<Address>,
+) -> Result<U256> {
     let mut user_min_recv = *final_min_recv;
 
     // Computes the lowest amount of tokens after weth
@@ -101,7 +112,8 @@ pub async fn get_univ2_exact_weth_token_min_recv(final_min_recv: &U256, path: &V
         let (from_reserves, to_reserves) = get_uniswap_v2_reserves(&pair).await?;
 
         // Get the new reserve data
-        (user_min_recv, _, _) = get_univ2_data_given_out(&user_min_recv, &from_reserves, &to_reserves);
+        (user_min_recv, _, _) =
+            get_univ2_data_given_out(&user_min_recv, &from_reserves, &to_reserves);
 
         // Decrement and iterate
         i -= 1;

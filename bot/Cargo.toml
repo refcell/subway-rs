@@ -22,6 +22,9 @@ futures = "0.3.23"
 tokio = { version = "1.0.1", features = ["rt-multi-thread", "macros"] }
 ansi_term = "0.12.1"
 yansi = "0.5.1"
+rand = "0.8.5"
+bytes = "1.2.1"
+ethers-flashbots = "0.10.0"
 
 [dev-dependencies]
 tracing-test = "0.2.3"
