@@ -50,3 +50,7 @@ path = "src/lib.rs"
 [[bin]]
 name = "hugo"
 path = "src/hugo.rs"
+
+[[bin]]
+name = "cabret"
+path = "src/cabret.rs"
