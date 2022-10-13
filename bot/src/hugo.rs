@@ -16,7 +16,7 @@ async fn main() -> Result<()> {
     println!("{}", banner::HUGO);
 
     // Configure Telemetry
-    let subscriber = telemetry::get_subscriber("hugo".into(), "info".into(), std::io::stdout);
+    let subscriber = telemetry::get_subscriber("info".into());
     telemetry::init_subscriber(subscriber);
 
     // Get the http provider for flashbots use
@@ -32,12 +32,12 @@ async fn main() -> Result<()> {
         .unwrap()
         .number
         .unwrap();
-    tracing::info!("[START] Hugo initializing on block {}...", last_block);
+    tracing::info!("[START] Hugo initializing on block {}", last_block);
 
     // Get the Flashbots Bundle Signer
     let bundle_signer = utils::get_bundle_signer()?;
     tracing::info!(
-        "[START] Flashbots bundle signer (! your searcher identity !): {}",
+        "[START] Flashbots bundle signer (! your searcher identity !): {:?}",
         bundle_signer.address()
     );
 
@@ -49,7 +49,7 @@ async fn main() -> Result<()> {
     let searcher_wallet = utils::get_searcher_wallet()?;
     let searcher_wallet_address = searcher_wallet.address();
     tracing::info!(
-        "[CONFIG] Searcher wallet address: {}",
+        "[CONFIG] Searcher wallet address: {:?}",
         searcher_wallet_address
     );
 
