@@ -12,21 +12,18 @@ Construct evm-based sandwich attacks using Rust and Huff.
 > Having highly optimized contracts is just one part of the equation, a tech stack is just as important as the contracts to execute on the opportunities.
 _Source: [libevm/subway](https://github.com/libevm/subway#subway)_
 
-If having a tech stack is just as important as optimized, secure contracts, then why not use the best language available for speed, dependability, and scalability?
-
-This is Hugo: A pure-rust bot used to execute sandwich attacks on UniswapV2.
+If having a tech stack is just as important as optimized, secure contracts, then why not use the best language available for speed, dependability, and scalability? This is Hugo: A pure-rust bot used to execute sandwich attacks on UniswapV2. Hugo's goal is to act as a low barrier of entry for rust-based MEV development - Reference source code for aspiring new searchers.
 
 Hugo is **fast**. But don't take our word for it, just check out the [benchmarks](./hugo/benches).
 
-Alongside Hugo, we have published [subway-rs](https://crate.io/crates/subway-rs): generalized, modular rust infrastructure that you may extend for your own MEV operations!
+Alongside Hugo, we have published [subway-rs](https://crate.io/crates/subway-rs) (the library located in [./bot](./bot/src/lib.rs)): generalized, modular rust infrastructure that you are encouraged to improve upon and extend for your own MEV operations!
 
-Hugo's goal is to act as a low barrier of entry for rust-based MEV development - Reference source code for aspiring new searchers.
 
 Hugo is able to:
 
 - Watch pending transactions in the mempool.
 - Decode Transaction data for Uniswap V2 Calls. (and more soon!)
-- Emit verbose logs using [tracing](https://crates.io/crates/tracing).
+- Verbose telemetry reporting using [tracing](https://crates.io/crates/tracing).
 - Search for profitable strategies efficiently using a variety of algorithms.
 - Calculate gas bribes.
 - Simulate and Execute Flashbot Bundles.
@@ -63,6 +60,7 @@ Please please be warned, this bot is intended as a piece of educational content,
 ### Acknowledgements
 
 - [subway](https://github.com/libevm/subway)
+- [quay](https://github.com/Alcibiades-Capital/quay)
 - [mev-template-rs](https://github.com/DeGatchi/mev-template-rs)
 - [foundry](https://github.com/foundry-rs/foundry)
 - [forge-std](https://github.com/brockelmore/forge-std)
@@ -73,4 +71,4 @@ Please please be warned, this bot is intended as a piece of educational content,
 
 All contributions are welcome!
 
-Please reach out to [asnared](https://twitter.com/asnared) on twitter if you have any questions.
+Please reach out to [asnared](https://twitter.com/asnared) on twitter for any questions or [open an issue](https://github.com/abigger87/subway-rs/issues/new).
