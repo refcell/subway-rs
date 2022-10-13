@@ -2,7 +2,7 @@
 
 # subway-rs • [![ci](https://github.com/abigger87/subway-rs/actions/workflows/ci.yaml/badge.svg)](https://github.com/abigger87/subway-rs/actions/workflows/ci.yaml) ![license](https://img.shields.io/badge/License-MIT-green.svg?label=license) ![twitter](https://img.shields.io/twitter/follow/asnared?style=social)
 
-A practical demonstration of constructing sandwich attacks with a modern stack.
+Construct evm-based sandwich attacks using Rust and Huff.
 
 
 ### What is this?
@@ -22,27 +22,28 @@ Alongside Hugo, we have published [subway-rs](https://crate.io/crates/subway-rs)
 
 Hugo's goal is to act as a low barrier of entry for rust-based MEV development - Reference source code for aspiring new searchers.
 
-This bot contains:
+Hugo is able to:
 
-- read from the mempool
-- decode transaction data
-- simple logging system
-- profit calculation algos
-- gas bribe calculation
-- bundle firing
-- misc
-  - doing math in JS
-  - calculating next base fee
+- Watch pending transactions in the mempool.
+- Decode Transaction data for Uniswap V2 Calls. (and more soon!)
+- Emit verbose logs using [tracing](https://crates.io/crates/tracing).
+- Search for profitable strategies efficiently using a variety of algorithms.
+- Calculate gas bribes.
+- Simulate and Execute Flashbot Bundles.
 
-While the bot is functional, the bot logic is a very simplistic one and does not contain a lot of the features that many advance searchers have (but not including), such as:
 
-- circuit breakers
-- poison token checker
-- caching system
-- robust logging system (e.g. graphana)
-- various gas saving ALPHAs
+### Future Improvements for Hugo
 
-As such, this bot is intended as a piece of educational content, and not for production use.
+Although the bot functions, it is simplistic and _certainly_ not competitive. Accept that advanced searchers to already be executing far beyond Hugo's capabilities. That being said, the following is low hanging fruit to take Hugo to the next level:
+
+- [ ] Circuit Breakers
+- [ ] Alerting (see: https://github.com/DeGatchi/mev-template-rs)
+- [ ] Poision Token Filtering
+- [ ] Caching + Memoization
+- [ ] Enhanced Logging Filters
+- [ ] Zero-cost Gas Savings :eyes:
+
+Please please be warned, this bot is intended as a piece of educational content, and not for production use. It has not been run in production, and should not be used in such an environment. If you are looking for a "quick buck", turn away now.
 
 
 ### Blueprint
@@ -59,6 +60,7 @@ As such, this bot is intended as a piece of educational content, and not for pro
 ### Acknowledgements
 
 - [subway](https://github.com/libevm/subway)
+- [mev-template-rs](https://github.com/DeGatchi/mev-template-rs)
 - [foundry](https://github.com/foundry-rs/foundry)
 - [forge-std](https://github.com/brockelmore/forge-std)
 - [foundry-huff](https://github.com/foundry-rs/foundry-huff)
