@@ -25,13 +25,23 @@ pub fn calculate_next_block_base_fee(block: Block<TxHash>) -> eyre::Result<U256>
     let gas_used = block.gas_used;
 
     // Get the target gas used
-    let target_gas_used = block.gas_limit / 2;
-
-    // Calculate the difference
-    let delta = gas_used - target_gas_used;
+    let mut target_gas_used = block.gas_limit / 2;
+    target_gas_used = if target_gas_used == U256::zero() {
+        U256::one()
+    } else {
+        target_gas_used
+    };
 
     // Calculate the new base fee
-    let new_base_fee = base_fee + ((base_fee * delta) / target_gas_used) / U256::from(8u64);
+    let new_base_fee = {
+        if gas_used > target_gas_used {
+            base_fee
+                + ((base_fee * (gas_used - target_gas_used)) / target_gas_used) / U256::from(8u64)
+        } else {
+            base_fee
+                - ((base_fee * (target_gas_used - gas_used)) / target_gas_used) / U256::from(8u64)
+        }
+    };
 
     // Add a random seed so it hashes differently
     let seed = rand::thread_rng().gen_range(0..9);

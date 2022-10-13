@@ -7,13 +7,17 @@ use eyre::Result;
 use reqwest::Url;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use subway_rs::{abi, banner, numeric, relayer, uniswap, utils};
+use subway_rs::{abi, banner, numeric, relayer, telemetry, uniswap, utils};
 
 #[tokio::main]
 async fn main() -> Result<()> {
     // Clear the screen and print the banner
     print!("{}[2J", 27 as char);
     println!("{}", banner::HUGO);
+
+    // Configure Telemetry
+    let subscriber = telemetry::get_subscriber("hugo".into(), "info".into(), std::io::stdout);
+    telemetry::init_subscriber(subscriber);
 
     // Get the http provider for flashbots use
     let http_provider = utils::get_http_provider()?;
@@ -79,7 +83,7 @@ async fn main() -> Result<()> {
                 continue;
             }
             Err(e) => {
-                tracing::error!("{:?}", e);
+                tracing::debug!("{:?}", e);
                 continue;
             }
             Ok(None) => { /* No Transaction, we can proceed with sandwiching */ }
@@ -106,10 +110,7 @@ async fn main() -> Result<()> {
             .duration_since(UNIX_EPOCH)
             .expect("Time went backwards")
             .as_secs();
-        println!(
-            "Comparing deadline: {} to current time: {}",
-            deadline, since_the_epoch
-        );
+
         if U256::from(since_the_epoch) > deadline {
             tracing::debug!("Transaction deadline has expired, skipping...");
             continue;
@@ -149,7 +150,7 @@ async fn main() -> Result<()> {
                 );
                 continue;
             };
-        println!("Got pair to swandwich: {:?}", pair_to_sandwich);
+        tracing::info!("Found pair to swandwich: {:?}", pair_to_sandwich);
 
         // Get the token reserves
         let (mut token_a_reserves, mut token_b_reserves) =
@@ -162,10 +163,6 @@ async fn main() -> Result<()> {
                 );
                 continue;
             };
-        println!(
-            "Got reserves for pair: [{:?}, {:?}]",
-            token_a_reserves, token_b_reserves
-        );
 
         // Swap the amounts if tokens are not in order
         if token_a > token_b {
@@ -173,14 +170,14 @@ async fn main() -> Result<()> {
         }
 
         // Caclulate the optimal swap amount
-        println!("Calculating optimal swap amount...");
+        tracing::info!("Calculating optimal swap amount...");
         let optimal_weth_in = numeric::calculate_sandwich_optimal_in(
             &user_amount_in,
             &user_min_recv,
             &token_a_reserves,
             &token_b_reserves,
         );
-        println!("Optimal swap amount: {:?}", optimal_weth_in);
+        tracing::info!("Optimal swap amount: {:?}", optimal_weth_in);
 
         // Lmeow, nothing to sandwich!
         if optimal_weth_in <= U256::zero() {
@@ -206,7 +203,7 @@ async fn main() -> Result<()> {
             continue;
         };
 
-        println!("Found Sandwich! Context {:#?}", sandwich_context);
+        tracing::info!("Found Sandwich Context {:#?}", sandwich_context);
 
         // Get block data to compute bribes etc
         // as bribes calculation has correlation with gasUsed
@@ -217,7 +214,7 @@ async fn main() -> Result<()> {
                 continue;
             }
             Err(e) => {
-                tracing::error!("{:?}", e);
+                tracing::debug!("{:?}", e);
                 continue;
             }
         };
@@ -242,6 +239,14 @@ async fn main() -> Result<()> {
             tracing::warn!("Failed to get searcher wallet nonce, skipping...");
             continue;
         };
+
+        tracing::info!(
+            "Sandwich Parameters: [block: {}, nonce: {}, base fee: {}]",
+            target,
+            nonce,
+            ethers::utils::format_units(next_base_fee, "ether")
+                .unwrap_or_else(|_| next_base_fee.to_string())
+        );
 
         // Construct the frontrun transaction
         // TODO: pack frontrun data
@@ -334,6 +339,8 @@ async fn main() -> Result<()> {
         // let txs = vec![frontrun_transaction_request, middle_transaction, backrun_transaction_request];
         let signed_transactions = vec![signed_frontrun_tx, tx.rlp(), signed_backrun_tx];
 
+        tracing::info!("Signed Transaction!");
+
         // Construct the bundle
         let bundle = if let Ok(b) = relayer::construct_bundle(&signed_transactions, target) {
             b
@@ -341,6 +348,8 @@ async fn main() -> Result<()> {
             tracing::warn!("Failed to construct flashbots bundle request, skipping...");
             continue;
         };
+
+        tracing::info!("Constructed Flashbots Bundle Request!");
 
         // Simulate the flashbots bundle
         let simulated_bundle =
@@ -354,6 +363,15 @@ async fn main() -> Result<()> {
         // Get the gas used from the simulated bundle
         let frontrun_gas = simulated_bundle.transactions[0].gas_used;
         let backrun_gas = simulated_bundle.transactions[2].gas_used;
+        let formatted_frontrun_gas = ethers::utils::format_units(frontrun_gas, "ether")
+            .unwrap_or_else(|_| frontrun_gas.to_string());
+        let formatted_backrun_gas = ethers::utils::format_units(backrun_gas, "ether")
+            .unwrap_or_else(|_| backrun_gas.to_string());
+        tracing::info!(
+            "Simulated Bundle Gas Costs: [frontrun: {} ether, backrun: {} ether]",
+            formatted_frontrun_gas,
+            formatted_backrun_gas
+        );
 
         // Bribe amount - set at 13.37%
         let bribe_amount = sandwich_context.revenue - frontrun_gas * next_base_fee;
