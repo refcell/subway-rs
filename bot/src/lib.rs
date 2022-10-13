@@ -22,6 +22,10 @@ pub mod uniswap;
 /// Numeric Operations
 pub mod numeric;
 
+/// Telemetry
+/// Uses [tracing](https://crates.io/crates/tracing) and [tracing-subscriber](https://crates.io/crates/tracing-subscriber)
+pub mod telemetry;
+
 /// Re-export a prelude
 pub mod prelude {
     pub use super::{abi::*, banner::*, numeric::*, relayer::*, uniswap::*, utils::*};

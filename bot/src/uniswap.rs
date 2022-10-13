@@ -14,15 +14,15 @@ pub fn sort_tokens(a: &mut Address, b: &mut Address) {
 }
 
 /// Gets the Uniswap V2 Pair Contract Address given two token addresses
-pub fn get_uniswap_v2_pair_address(a: &Address, b: &Address) -> Result<Address> {
+pub fn calculate_uniswap_v2_pair_address(a: &Address, b: &Address) -> Result<Address> {
     // Sort the tokens
     let mut tokens = vec![a, b];
     tokens.sort();
 
     // Copy the token addresses into a byte array
-    let mut data = [0u8; 32];
-    data[12..].copy_from_slice(a.as_bytes());
-    data[24..].copy_from_slice(b.as_bytes());
+    let mut data = [0u8; 40];
+    data[0..20].copy_from_slice(tokens[0].as_bytes());
+    data[20..].copy_from_slice(tokens[1].as_bytes());
 
     // Hash the concatenated token address bytes
     let salt = ethers::utils::keccak256(data);
@@ -38,6 +38,19 @@ pub fn get_uniswap_v2_pair_address(a: &Address, b: &Address) -> Result<Address> 
         salt,
         Bytes::from(init_code),
     ))
+}
+
+/// Gets the Uniswap V2 Pair Contract Address given two token addresses
+pub async fn get_uniswap_v2_pair_address(a: &Address, b: &Address) -> Result<Address> {
+    // Get the uniswap v2 factory contract
+    let factory = crate::utils::get_univ2_factory_contract()?;
+
+    // Get the pair address
+    factory
+        .get_pair(*a, *b)
+        .call()
+        .await
+        .map_err(|e| eyre::eyre!(e))
 }
 
 /// Get the Uniswap V2 Reserves for a give token pair
@@ -106,7 +119,8 @@ pub async fn get_univ2_exact_weth_token_min_recv(
         // Get the token pair address
         let from_token = path[i - 1];
         let to_token = path[i];
-        let pair = get_uniswap_v2_pair_address(&from_token, &to_token)?;
+        // TODO: Use the calculate function to get the correct pair address
+        let pair = get_uniswap_v2_pair_address(&from_token, &to_token).await?;
 
         // Get the token pair reserves
         let (from_reserves, to_reserves) = get_uniswap_v2_reserves(&pair).await?;

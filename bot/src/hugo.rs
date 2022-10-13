@@ -139,7 +139,7 @@ async fn main() -> Result<()> {
 
         // Get the pair to sandwich
         let pair_to_sandwich =
-            if let Ok(p) = uniswap::get_uniswap_v2_pair_address(&token_a, &token_b) {
+            if let Ok(p) = uniswap::get_uniswap_v2_pair_address(&token_a, &token_b).await {
                 p
             } else {
                 tracing::debug!(

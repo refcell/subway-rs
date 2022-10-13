@@ -6,7 +6,7 @@ use ethers::{prelude::*, types::transaction::eip2718::TypedTransaction};
 use eyre::Result;
 use rand::Rng;
 
-use crate::abi::UniswapV2Pair;
+use crate::{abi::UniswapV2Pair, prelude::UniswapV2Factory};
 
 /// Get Raw Transaction
 pub fn get_raw_transaction(tx: &Transaction) -> TypedTransaction {
@@ -150,4 +150,18 @@ pub fn get_univ2_contract(
 
     // Return the contract
     Ok(UniswapV2Pair::new(*address, client))
+}
+
+/// Construct the Uniswap V2 Factory Contract
+pub fn get_univ2_factory_contract(
+) -> Result<UniswapV2Factory<SignerMiddleware<Provider<Http>, LocalWallet>>> {
+    // Create a client
+    let provider = get_http_provider()?;
+    let client = create_http_client(provider, 1)?;
+
+    // Get the factory address
+    let factory_address = get_univ2_factory_address()?;
+
+    // Return the contract
+    Ok(UniswapV2Factory::new(factory_address, client))
 }

@@ -8,6 +8,7 @@ use eyre::Result;
 
 abigen!(UniswapV2Pair, "src/abi/IUniswapV2Pair.json");
 abigen!(UniswapV2Router02, "src/abi/IUniswapV2Router02.json");
+abigen!(UniswapV2Factory, "src/abi/IUniswapV2Factory.json");
 
 /// Decodes the raw tx data into a UniswapV2Router02 Call
 pub fn decode_uniswap_router_calldata(data: &Bytes) -> Result<SwapExactETHForTokensCall> {
