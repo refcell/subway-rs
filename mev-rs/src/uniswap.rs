@@ -72,7 +72,7 @@ pub fn get_univ2_data_given_in(
     let a_in_with_fee = a_in * 997;
     let numerator = a_in_with_fee * b_reserves;
     let denominator = a_reserves * 1000 + a_in_with_fee;
-    let b_out = numerator / denominator;
+    let b_out = numerator.checked_div(denominator).unwrap_or(U256::zero());
 
     // Calculate the new b reserves, accounting for underflow
     let new_b_reserves = b_reserves.checked_sub(b_out).unwrap_or(U256::one());
@@ -97,7 +97,7 @@ pub fn get_univ2_data_given_out(
     // Calculate the amount in
     let numerator = a_reserves * b_out * 1000;
     let denominator = new_b_reserves * 997;
-    let a_in = numerator / denominator + 1;
+    let a_in = numerator.checked_div(denominator).unwrap_or(U256::zero()) + 1;
 
     // Calculate the new a reserves, accounting for overflow
     let new_a_reserves = a_reserves.checked_add(a_in).unwrap_or(U256::MAX);
