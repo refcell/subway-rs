@@ -13,9 +13,6 @@ pub mod utils;
 /// ABIs
 pub mod abi;
 
-/// Banner
-pub mod banner;
-
 /// Uniswap Utilities
 pub mod uniswap;
 
@@ -28,5 +25,5 @@ pub mod telemetry;
 
 /// Re-export a prelude
 pub mod prelude {
-    pub use super::{abi::*, banner::*, numeric::*, relayer::*, uniswap::*, utils::*};
+    pub use super::{abi::*, numeric::*, relayer::*, uniswap::*, utils::*};
 }

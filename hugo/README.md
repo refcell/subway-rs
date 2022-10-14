@@ -1,6 +1,6 @@
 <img align="right" width="150" height="150" top="100" src="./assets/hugo.png">
 
-# subway-rs/hugo • [![ci](https://github.com/abigger87/subway-rs/actions/workflows/ci.yaml/badge.svg)](https://github.com/abigger87/subway-rs/actions/workflows/ci.yaml) ![license](https://img.shields.io/badge/License-MIT-green.svg?label=license) ![crates.io](https://img.shields.io/crates/v/subway-rs)
+# hugo-rs • [![ci](https://github.com/abigger87/subway-rs/actions/workflows/ci.yaml/badge.svg)](https://github.com/abigger87/subway-rs/actions/workflows/ci.yaml) ![license](https://img.shields.io/badge/License-MIT-green.svg?label=license) ![crates.io](https://img.shields.io/crates/v/hugo-rs)
 
 
 A highly optimized sandwich bot and related infrastructure written in pure rust.
@@ -41,7 +41,7 @@ SANDWICH_CONTRACT=0x0000000000000000000000000000000000000000
 Then, you can simply run the bot with:
 
 ```bash
-cargo run --bin hugo --release
+cargo run --bin hugo --release -- --tick-rate 200
 ```
 
 And you should be good to go!
