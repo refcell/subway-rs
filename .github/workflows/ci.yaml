@@ -3,11 +3,6 @@ name: ci
 on: [push]
 
 jobs:
-
-  #############################################################
-  # Contracts Actions
-  #############################################################
-
   forge-tests:
     runs-on: ubuntu-latest
     defaults:
@@ -106,11 +101,7 @@ jobs:
             forge script $file -vvvv
           done
 
-  #############################################################
-  # Cabret Actions
-  #############################################################
-
-  cargo-tests:
+  cargo-tests-cabret:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -134,7 +125,7 @@ jobs:
       - name: cargo test
         run: cargo test --all --all-features
 
-  cargo-lint:
+  cargo-lint-cabret:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -157,7 +148,7 @@ jobs:
       - name: cargo clippy
         run: cargo +nightly clippy --all --all-features -- -D warnings
 
-  cargo-build:
+  cargo-build-cabret:
     runs-on: ubuntu-latest
     continue-on-error: true
     defaults:
@@ -180,12 +171,7 @@ jobs:
         continue-on-error: true
         run: cargo +nightly build --all
 
-
-  #############################################################
-  # Hugo Actions
-  #############################################################
-
-  cargo-tests:
+  cargo-tests-hugo:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -209,7 +195,7 @@ jobs:
       - name: cargo test
         run: cargo test --all --all-features
 
-  cargo-lint:
+  cargo-lint-hugo:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -232,7 +218,7 @@ jobs:
       - name: cargo clippy
         run: cargo +nightly clippy --all --all-features -- -D warnings
 
-  cargo-build:
+  cargo-build-hugo:
     runs-on: ubuntu-latest
     continue-on-error: true
     defaults:
@@ -255,12 +241,7 @@ jobs:
         continue-on-error: true
         run: cargo +nightly build --all
 
-
-  #############################################################
-  # mev-rs Actions
-  #############################################################
-
-  cargo-tests:
+  cargo-tests-mev-rs:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -284,7 +265,7 @@ jobs:
       - name: cargo test
         run: cargo test --all --all-features
 
-  cargo-lint:
+  cargo-lint-mev-rs:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -307,7 +288,7 @@ jobs:
       - name: cargo clippy
         run: cargo +nightly clippy --all --all-features -- -D warnings
 
-  cargo-build:
+  cargo-build-mev-rs:
     runs-on: ubuntu-latest
     continue-on-error: true
     defaults:
