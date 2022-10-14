@@ -35,6 +35,7 @@ Required Preparation:
 > Some providers do NOT support all the RPC methods used by the bot.
 >
 > For instance, it is not possible to use infura to listen to pending transactions because `eth_newPendingTransactionFilter` is not supported.
+
 ```ignore
 RPC_URL=http://127.0.0.1:8545
 RPC_URL_WSS=ws://127.0.0.1:8546
