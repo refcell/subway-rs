@@ -30,6 +30,11 @@ Required Preparation:
 2. Deploy a sandwich contract from the [contracts](../contracts/) directory, or re-use an existing one.
 3. Create a `.env` file and set the required variables, referencing the below environment variables. (NOTE: we've added `.env` and `.env.prod` to the `.gitignore` file, so you don't accidentally commit your secrets to the repo. All other secret commits are on you. Exercise caution.)
 
+> **Warning**
+>
+> Some providers do NOT support all the RPC methods used by the bot.
+>
+> For instance, it is not possible to use infura to listen to pending transactions because `eth_newPendingTransactionFilter` is not supported.
 ```ignore
 RPC_URL=http://127.0.0.1:8545
 RPC_URL_WSS=ws://127.0.0.1:8546
