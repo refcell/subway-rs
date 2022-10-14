@@ -1,6 +1,6 @@
 <img align="right" width="150" height="150" top="100" src="./assets/hugo.png">
 
-# subway-rs/hugo • [![ci](https://github.com/abigger87/subway-rs/actions/workflows/ci.yaml/badge.svg)](https://github.com/abigger87/subway-rs/actions/workflows/ci.yaml) ![license](https://img.shields.io/badge/License-MIT-green.svg?label=license) ![crates.io](https://img.shields.io/crates/v/subway-rs)
+# hugo-rs • [![ci](https://github.com/abigger87/subway-rs/actions/workflows/ci.yaml/badge.svg)](https://github.com/abigger87/subway-rs/actions/workflows/ci.yaml) ![license](https://img.shields.io/badge/License-MIT-green.svg?label=license) ![crates.io](https://img.shields.io/crates/v/hugo-rs)
 
 
 A highly optimized sandwich bot and related infrastructure written in pure rust.
@@ -35,6 +35,7 @@ Required Preparation:
 > Some providers do NOT support all the RPC methods used by the bot.
 >
 > For instance, it is not possible to use infura to listen to pending transactions because `eth_newPendingTransactionFilter` is not supported.
+
 ```ignore
 RPC_URL=http://127.0.0.1:8545
 RPC_URL_WSS=ws://127.0.0.1:8546
@@ -46,7 +47,7 @@ SANDWICH_CONTRACT=0x0000000000000000000000000000000000000000
 Then, you can simply run the bot with:
 
 ```bash
-cargo run --bin hugo --release
+cargo run --bin hugo --release -- --tick-rate 200
 ```
 
 And you should be good to go!

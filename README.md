@@ -16,7 +16,7 @@ If having a tech stack is just as important as optimized, secure contracts, then
 
 Hugo is **fast**. But don't take our word for it, just check out the [benchmarks](./hugo/benches).
 
-Alongside Hugo, we have published [subway-rs](https://crate.io/crates/subway-rs) (the library located in [./bot](./bot/src/lib.rs)): generalized, modular rust infrastructure that you are encouraged to improve upon and extend for your own MEV operations!
+Alongside [Hugo](./hugo/), we have published [mev-rs](https://crate.io/crates/mev-rs) (the library located in [./mev-rs](./mev-rs/src/lib.rs)): generalized, modular rust infrastructure that you are encouraged to improve upon and extend for your own MEV operations!
 
 
 Hugo is able to:
@@ -45,14 +45,18 @@ Although the bot functions, it is simplistic and _certainly_ not competitive. Ac
 - [ ] Persistent Execution Storage and Tracking (eg: psql, a rekt threshold, P&L)
 - [ ] Refactored Wallet Management
 
-Again, please be aware, this bot is intended as a piece of educational content, and not for production use. It has not been run in production, and should not be used in such an environment. 
+Again, please be aware, this bot is intended as a piece of educational content, and not for production use. It has not been run in production, and should not be used in such an environment.
 
 
 ### Blueprint
 
 ```ml
 .
-├─ bot — A highly optimized, pure rust sandwich bot.
+├─ cabret — A verbose wallet inspector.
+|  └─ ...
+├─ hugo — A highly optimized, pure rust sandwich bot.
+|  └─ ...
+├─ mev-rs — Modern and maximally-minimal rust tooling for MEV.
 |  └─ ...
 └─ contracts — UniswapV2 sandwich attack contracts.
    └─ ...

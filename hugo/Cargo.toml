@@ -1,5 +1,5 @@
 [package]
-name = "subway-rs"
+name = "hugo-rs"
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
@@ -9,28 +9,16 @@ repository = "https://github.com/abigger87/subway-rs"
 keywords = ["Rust", "Ethereum", "Arbitrage", "Sandwich"]
 
 [dependencies]
-# Core Ethers
-ethers = { version = "0.17.0", features = [ "abigen", "ws", "rustls" ] }
-ethers-flashbots = "0.10.0"
-
-# Serialization
-serde = { version = "1.0.137", features = ["derive"] }
-serde_json = { version = "1.0.82", features = [ "raw_value" ] }
-
-# Runtime
-tokio = { version = "1.0.1", features = ["rt-multi-thread", "macros"] }
-
-# Error Handling
 eyre = { version = "0.6" }
-thiserror = "1.0.31"
+tui = { version = "0.19.0", features = [ "termion" ] }
+clap = { version = "4.0", features = ["derive", "env", "wrap_help"] }
+tokio = { version = "1.0.1", features = ["rt-multi-thread", "macros"] }
+ethers = { version = "0.17.0", features = [ "abigen", "ws", "rustls" ] }
 
 # Misc
-hex = "0.4.3"
 rand = "0.8.5"
-bytes = "1.2.1"
 futures = "0.3.23"
 reqwest = { version = "0.11.10", features = ["json", "blocking"] }
-rlp = { version = "0.5.1", default-features = false }
 
 # Telemtry
 yansi = "0.5.1"
@@ -39,20 +27,10 @@ tracing = "0.1.36"
 tracing-bunyan-formatter = "0.3.4"
 tracing-log = "0.1.3"
 tracing-subscriber = { version = "0.3.16", features = ["fmt", "env-filter", "ansi"] }
-time = "0.3.15"
 chrono = "0.4.22"
-
-[dev-dependencies]
-tracing-test = "0.2.3"
-
-[lib]
-name = "subway_rs"
-path = "src/lib.rs"
+termion = "1.5.6"
 
 [[bin]]
 name = "hugo"
-path = "src/hugo.rs"
-
-[[bin]]
-name = "cabret"
-path = "src/cabret.rs"
+path = "src/main.rs"
+features = [ "crossterm" ]

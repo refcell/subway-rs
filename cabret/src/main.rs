@@ -1,13 +1,31 @@
 use ansi_term::Colour::{Blue, Green};
 use ethers::prelude::*;
 use eyre::Result;
-use subway_rs::{banner, utils};
+use mev_rs::{utils};
+
+/// The cabret banner
+pub const CABRET: &str = r#"
+
+
+ ▄████▄   ▄▄▄       ▄▄▄▄    ██▀███  ▓█████▄▄▄█████▓
+▒██▀ ▀█  ▒████▄    ▓█████▄ ▓██ ▒ ██▒▓█   ▀▓  ██▒ ▓▒
+▒▓█    ▄ ▒██  ▀█▄  ▒██▒ ▄██▓██ ░▄█ ▒▒███  ▒ ▓██░ ▒░
+▒▓▓▄ ▄██▒░██▄▄▄▄██ ▒██░█▀  ▒██▀▀█▄  ▒▓█  ▄░ ▓██▓ ░
+▒ ▓███▀ ░ ▓█   ▓██▒░▓█  ▀█▓░██▓ ▒██▒░▒████▒ ▒██▒ ░
+░ ░▒ ▒  ░ ▒▒   ▓▒█░░▒▓███▀▒░ ▒▓ ░▒▓░░░ ▒░ ░ ▒ ░░
+  ░  ▒     ▒   ▒▒ ░▒░▒   ░   ░▒ ░ ▒░ ░ ░  ░   ░
+░          ░   ▒    ░    ░   ░░   ░    ░    ░
+░ ░            ░  ░ ░         ░        ░  ░
+░                        ░
+
+
+"#;
 
 #[tokio::main]
 async fn main() -> Result<()> {
     // Clear the screen and print the banner
     print!("{}[2J", 27 as char);
-    println!("{}", banner::CABRET);
+    println!("{}", CABRET);
 
     // Create the websocket clieant
     let client = utils::create_websocket_client().await?;

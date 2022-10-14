@@ -1,8 +1,8 @@
 #![allow(unused)]
 
 use ethers::prelude::*;
+use mev_rs::uniswap::*;
 use std::str::FromStr;
-use subway_rs::uniswap::*;
 
 #[test]
 fn test_calculate_uniswap_v2_pair_address() {

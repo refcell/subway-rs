@@ -177,7 +177,11 @@ async fn main() -> Result<()> {
             &token_a_reserves,
             &token_b_reserves,
         );
-        tracing::info!("Optimal swap amount: {:?}", optimal_weth_in);
+        tracing::info!(
+            "[CALC] Optimal swap amount: {} ether",
+            ethers::utils::format_units(optimal_weth_in, "ether")
+                .unwrap_or_else(|_| optimal_weth_in.to_string())
+        );
 
         // Lmeow, nothing to sandwich!
         if optimal_weth_in <= U256::zero() {
@@ -199,7 +203,7 @@ async fn main() -> Result<()> {
         ) {
             sc
         } else {
-            tracing::warn!("Failed to calculate sandwich context, skipping...");
+            tracing::warn!("[ABORT] Failed to calculate sandwich context, skipping...");
             continue;
         };
 
@@ -210,7 +214,7 @@ async fn main() -> Result<()> {
         let block = match client.get_block(BlockId::Number(BlockNumber::Latest)).await {
             Ok(Some(b)) => b,
             Ok(None) => {
-                tracing::warn!("Failed to get latest block, skipping...");
+                tracing::warn!("[ABORT] Failed to get latest block, skipping...");
                 continue;
             }
             Err(e) => {
@@ -221,13 +225,13 @@ async fn main() -> Result<()> {
         let target = if let Some(b) = block.number {
             b + 1
         } else {
-            tracing::warn!("Failed to get latest block number, skipping...");
+            tracing::warn!("[ABORT] Failed to get latest block number, skipping...");
             continue;
         };
         let next_base_fee = if let Ok(nbf) = utils::calculate_next_block_base_fee(block) {
             nbf
         } else {
-            tracing::warn!("Failed to calculate next block base fee, skipping...");
+            tracing::warn!("[ABORT] Failed to calculate next block base fee, skipping...");
             continue;
         };
         let nonce = if let Ok(n) = client
@@ -236,7 +240,7 @@ async fn main() -> Result<()> {
         {
             n
         } else {
-            tracing::warn!("Failed to get searcher wallet nonce, skipping...");
+            tracing::warn!("[ABORT] Failed to get searcher wallet nonce, skipping...");
             continue;
         };
 
@@ -280,7 +284,7 @@ async fn main() -> Result<()> {
             if let Ok(s) = searcher_wallet.sign_transaction(&frontrun_tx_typed).await {
                 s
             } else {
-                tracing::warn!("Failed to sign frontrun transaction, skipping...");
+                tracing::warn!("[ABORT] Failed to sign frontrun transaction, skipping...");
                 continue;
             };
         let signed_frontrun_tx = frontrun_tx_typed.rlp_signed(&signed_frontrun_tx_sig);
@@ -319,7 +323,7 @@ async fn main() -> Result<()> {
             if let Ok(s) = searcher_wallet.sign_transaction(&backrun_tx_typed).await {
                 s
             } else {
-                tracing::warn!("Failed to sign backrun transaction, skipping...");
+                tracing::warn!("[ABORT] Failed to sign backrun transaction, skipping...");
                 continue;
             };
         let signed_backrun_tx = backrun_tx_typed.rlp_signed(&signed_backrun_tx_sig);
@@ -342,22 +346,24 @@ async fn main() -> Result<()> {
         tracing::info!("Signed Transaction!");
 
         // Construct the bundle
-        let bundle = if let Ok(b) = relayer::construct_bundle(&signed_transactions, target) {
-            b
-        } else {
-            tracing::warn!("Failed to construct flashbots bundle request, skipping...");
-            continue;
+        let bundle =  match relayer::construct_bundle(&signed_transactions, target) {
+            Ok(b) => b,
+            Err(e) => {
+                tracing::warn!("[ABORT] Failed to construct flashbots bundle request: {:?}", e);
+                continue;
+            }
         };
 
-        tracing::info!("Constructed Flashbots Bundle Request!");
+        tracing::info!("[FLASHBOTS] Constructed Flashbots Bundle Request!");
 
         // Simulate the flashbots bundle
         let simulated_bundle =
-            if let Ok(sb) = flashbots_client.inner().simulate_bundle(&bundle).await {
-                sb
-            } else {
-                tracing::warn!("Failed to simulate flashbots bundle, skipping...");
-                continue;
+            match flashbots_client.inner().simulate_bundle(&bundle).await {
+                Ok(sb) => sb,
+                Err(e) => {
+                    tracing::warn!("[ABORT] Failed to simulate flashbots bundle: {:?}", e);
+                    continue;
+                }
             };
 
         // Get the gas used from the simulated bundle
@@ -395,7 +401,7 @@ async fn main() -> Result<()> {
             pb
         } else {
             // TODO: Add retrying logic here
-            tracing::warn!("Failed to send flashbots bundle, skipping...");
+            tracing::warn!("[ABORT] Failed to send flashbots bundle, skipping...");
             continue;
         };
 
