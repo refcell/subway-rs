@@ -1,0 +1,23 @@
+name: publish-crates
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  forge-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./mev-rs
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+            toolchain: stable
+            override: true
+
+      - uses: katyo/publish-crates@v1
+        with:
+            registry-token: ${{ secrets.CARGO_REGISTRY_TOKEN }}
