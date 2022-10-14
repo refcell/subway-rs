@@ -52,12 +52,7 @@ async fn main() -> Result<()> {
         Blue.paint(format!("Wallet Balance: {:?}", wallet_balance))
     );
 
-    // Create pending stream
-    let stream = if let Ok(c) = client.watch_pending_transactions().await {
-        c
-    } else {
-        panic!("Failed to create filter watcher for pending transactions!");
-    };
+    let stream = client.watch_pending_transactions().await?;
 
     // Create transaction stream
     let mut tx_stream = stream.transactions_unordered(usize::MAX);
