@@ -6,7 +6,26 @@ use ethers::{prelude::*, types::transaction::eip2718::TypedTransaction};
 use eyre::Result;
 use rand::Rng;
 
-use crate::{abi::UniswapV2Pair, prelude::UniswapV2Factory};
+/// Sorts two tokens
+pub fn sort_tokens(a: &mut Address, b: &mut Address) {
+    if a > b {
+        std::mem::swap(a, b);
+    }
+}
+
+/// Returns the WETH Contract Address
+///
+/// Although this function unwraps the address conversion, it is safe as the string is checked.
+pub fn get_weth_address() -> Address {
+    Address::from_str("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2").unwrap()
+}
+
+/// Returns the usdc Contract Address
+///
+/// Although this function unwraps the address conversion, it is safe as the string is checked.
+pub fn get_usdc_address() -> Address {
+    Address::from_str("0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48").unwrap()
+}
 
 /// Get Raw Transaction
 pub fn get_raw_transaction(tx: &Transaction) -> TypedTransaction {
@@ -67,35 +86,11 @@ pub fn read_env_vars() -> Result<Vec<(String, String)>> {
     Ok(env_vars)
 }
 
-/// Returns the Uniswap V2 Pair Contract Address
-pub fn get_univ2_address() -> Result<Address> {
-    Address::from_str("0x7a250d5630b4cf539739df2c5dacb4c659f2488d")
-        .map_err(|_| eyre::eyre!("Invalid address"))
-}
-
-/// Returns the Uniswap V2 Factory Address
-pub fn get_univ2_factory_address() -> Result<Address> {
-    Address::from_str("0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f")
-        .map_err(|_| eyre::eyre!("Invalid address"))
-}
-
 /// Returns the configured Sandwich Contract Address
 pub fn get_sandwich_contract_address() -> Result<Address> {
     let addr = std::env::var("SANDWICH_CONTRACT")
         .map_err(|_| eyre::eyre!("Required environment variable \"SANDWICH_CONTRACT\" not set"))?;
     Address::from_str(&addr).map_err(|_| eyre::eyre!("Invalid address \"{}\"", addr))
-}
-
-/// Returns the WETH Contract Address
-pub fn get_weth_address() -> Result<Address> {
-    Address::from_str("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2")
-        .map_err(|_| eyre::eyre!("Invalid address"))
-}
-
-/// Returns the usdc Contract Address
-pub fn get_usdc_address() -> Result<Address> {
-    Address::from_str("0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48")
-        .map_err(|_| eyre::eyre!("Invalid address"))
 }
 
 /// Return a Provider for the given URL
@@ -147,31 +142,4 @@ pub fn create_http_client(
     let wallet = get_searcher_wallet()?;
     let client = SignerMiddleware::new(p, wallet.with_chain_id(chain_id));
     Ok(Arc::new(client))
-}
-
-/// Construct the Uniswap V2 Pair Contract
-pub fn get_univ2_contract(
-    chain_id: u64,
-    address: &Address,
-) -> Result<UniswapV2Pair<SignerMiddleware<Provider<Http>, LocalWallet>>> {
-    // Create a client
-    let provider = get_http_provider()?;
-    let client = create_http_client(provider, chain_id)?;
-
-    // Return the contract
-    Ok(UniswapV2Pair::new(*address, client))
-}
-
-/// Construct the Uniswap V2 Factory Contract
-pub fn get_univ2_factory_contract(
-) -> Result<UniswapV2Factory<SignerMiddleware<Provider<Http>, LocalWallet>>> {
-    // Create a client
-    let provider = get_http_provider()?;
-    let client = create_http_client(provider, 1)?;
-
-    // Get the factory address
-    let factory_address = get_univ2_factory_address()?;
-
-    // Return the contract
-    Ok(UniswapV2Factory::new(factory_address, client))
 }

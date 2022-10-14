@@ -5,27 +5,43 @@ use mev_rs::uniswap::*;
 use std::str::FromStr;
 
 #[test]
-fn test_sort_tokens() {
-    let mut a = Address::from_str("0x0000000000000000000000000000000000000001").unwrap();
-    let mut b = Address::from_str("0x0000000000000000000000000000000000000002").unwrap();
-    sort_tokens(&mut a, &mut b);
+fn test_get_univ2_router_address() {
+    let factory = get_univ2_router_address();
     assert_eq!(
-        a,
-        Address::from_str("0x0000000000000000000000000000000000000001").unwrap()
+        factory,
+        Address::from_str("0x7a250d5630b4cf539739df2c5dacb4c659f2488d").unwrap()
     );
+}
+
+#[test]
+fn test_get_univ2_factory_address() {
+    let factory = get_univ2_factory_address();
     assert_eq!(
-        b,
-        Address::from_str("0x0000000000000000000000000000000000000002").unwrap()
+        factory,
+        Address::from_str("0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f").unwrap()
     );
-    sort_tokens(&mut b, &mut a);
-    assert_eq!(
-        a,
-        Address::from_str("0x0000000000000000000000000000000000000002").unwrap()
-    );
-    assert_eq!(
-        b,
-        Address::from_str("0x0000000000000000000000000000000000000001").unwrap()
-    );
+}
+
+#[tokio::test]
+async fn test_get_univ2_pair_contract() {
+    let pair = get_univ2_pair_contract(
+        1,
+        &Address::from_str("0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc").unwrap(),
+    )
+    .unwrap();
+
+    // Validate the pair contract by calling the name field
+    let name = pair.name().call().await.unwrap();
+    assert_eq!(name, "Uniswap V2");
+}
+
+#[tokio::test]
+async fn test_get_univ2_factory_contract() {
+    let factory = get_univ2_factory_contract().unwrap();
+
+    // Validate contract
+    let pairs = factory.all_pairs_length().call().await.unwrap();
+    assert!(pairs > U256::zero());
 }
 
 #[test]

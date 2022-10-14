@@ -6,6 +6,7 @@
 
 // Interface
 #define function recoverERC20(address) nonpayable returns ()
+#define function recoverETH() nonpayable returns ()
 
 // Functions this contract will call
 // NOTE: __FUNC_SIG builtin calls generate the function selector bytes4 at *compile time*
@@ -15,7 +16,7 @@
 // bytes4 internal constant PAIR_SWAP_ID = 0x022c0d9f;
 #define function swap(uint256, uint256, address, bytes) nonpayable returns ()
 #define function balanceOf(address) view returns (uint256)
-#define function safeTransfer(address,uint256) nonpayable returns ()
+#define function transfer(address,uint256) nonpayable returns ()
 
 // The allowed user
 // This will be overriden with the constructor flag
@@ -32,50 +33,69 @@
     0x03 dup1 revert
 }
 
-/// @notice Receive profits from contract
-#define macro RECOVER_ERC20() = takes (0) returns (0) {
-    0x04 calldataload                       // [token]
-
+/// @notice Fetches the token balance of the caller for the provided token
+/// @notice Stack Input: [token]
+/// @notice Stack Output: [balance, token]
+#define macro STATIC_CALL_TOKEN_BALANCE_MINUS_ONE(err) = takes (1) returns (2) {
     // Static Call token.balanceOf(address(this))
     __FUNC_SIG(balanceOf) 0x00 mstore       // [token]
-    address 0x04 mstore                     // [token]
+    address 0x20 mstore                     // [token]
 
     0x20                                    // [retSize, token]
     0x00                                    // [retOffset, retSize, token]
     0x24                                    // [argSize, retOffset, retSize, token]
-    dup2                                    // [argOffset, argSize, retOffset, retSize, token]
+    0x1c                                    // [argOffset, argSize, retOffset, retSize, token]
     dup5                                    // [to, argOffset, argSize, retOffset, retSize, token]
     gas                                     // [gas, to, argOffset, argSize, retOffset, retSize, token]
     staticcall                              // [success, token]
 
-    // Validate successful call and load balance
-    iszero error jumpi                      // [token]
+    // Validate successful call
+    iszero <err> jumpi                      // [token]
     0x00 mload                              // [balance, token]
+    dup1 iszero skip jumpi
+    0x01 swap1 sub                          // [(balance - 1), token]
+    skip:                                   // [(balance - 1) | 0, token]
+}
 
-    // Call token.safeTransfer(address(this), balance)
-    __FUNC_SIG(safeTransfer) 0xe0 shl 0x00 mstore    // [balance, token]
-    address 0x04 mstore                     // [balance, token]
-    0x24 mstore                             // [token]
-
-    0x00                    // [retSize, token]
-    0x00                    // [retOffset, retSize, token]
-    0x24                    // [argSize, retOffset, retSize, token]
-    dup2                    // [argOffset, argSize, retOffset, retSize, token]
-    dup1                    // [value, argOffset, argSize, retOffset, retSize, token]
-    dup6                    // [to, value, argOffset, argSize, retOffset, retSize, token]
-    gas                     // [gas, to, value, argOffset, argSize, retOffset, retSize, token]
-    call                    // [success, token]
+/// @notice Withdraws eth from this contract to the caller
+#define macro RECOVER_ETH() = takes (0) returns (0) {
+    // Get the balance of this contract
+    0x00                                    // [retSize]
+    dup1                                    // [retOffset, retSize]
+    dup1                                    // [argSize, retOffset, retSize]
+    dup1                                    // [argOffset, argSize, retOffset, retSize]
+    selfbalance                             // [balance, argOffset, argSize, retOffset, retSize]
+    caller                                  // [caller, balance, argOffset, argSize, retOffset, retSize]
+    0x1388 gas sub                          // [(gas - 5000), caller, balance, argOffset, argSize, retOffset, retSize]
+    call                                    // [success]
 
     // Validate call success
-    iszero error jumpi                      // [token]
+    iszero error jumpi stop
+}
 
-    // Stop execution
-    stop
+/// @notice Receive profits from contract
+#define macro RECOVER_ERC20() = takes (0) returns (0) {
+    0x04 calldataload                       // [token]
 
-    // Error Jump Destination
-    error:
-        WAGMI()
+    // Get the balance of this contract
+    STATIC_CALL_TOKEN_BALANCE_MINUS_ONE(error)        // [balance, token]
 
+    // Call token.transfer(msg.sender, balance)
+    __FUNC_SIG(transfer) 0x00 mstore    // [balance, token]
+    caller 0x20 mstore                      // [balance, token]
+    0x40 mstore                             // [token]
+
+    0x00                                    // [retSize, token]
+    0x00                                    // [retOffset, retSize, token]
+    0x44                                    // [argSize, retOffset, retSize, token]
+    0x1c                                    // [argOffset, argSize, retOffset, retSize, token]
+    dup3                                    // [value, argOffset, argSize, retOffset, retSize, token]
+    dup6                                    // [to, value, argOffset, argSize, retOffset, retSize, token]
+    gas                                     // [gas, to, value, argOffset, argSize, retOffset, retSize, token]
+    call                                    // [success, token]
+
+    // Validate call success
+    iszero error jumpi stop
 }
 
 /// @notice Executes a sandwich attack
@@ -102,7 +122,7 @@
     call                    // [success, tokenOutNo, amountOut, amountIn, pair, token]
 
     // Validate call success
-    iszero ngmi jumpi       // [tokenOutNo, amountOut, amountIn, pair, token]
+    iszero error jumpi       // [tokenOutNo, amountOut, amountIn, pair, token]
 
     // Call pair.swap(tokenOutNo == 0 ? amountOut : 0, tokenOutNo == 1 ? amountOut : 0, address(this), new bytes(0))
     __FUNC_SIG(swap) 0xe0 shl 0x00 mstore   // [tokenOutNo, amountOut, amountIn, pair, token]
@@ -132,39 +152,30 @@
     call                    // [success, amountIn, pair, token]
 
     // Validate call success
-    iszero ngmi jumpi       // [amountIn, pair, token]
-
-    // End Execution
-    stop
-
-    ngmi:
-        WAGMI()
+    iszero error jumpi stop
 }
 
 /// @notice The main dispatch fallback
 #define macro MAIN() = takes (0) returns (0) {
     // Get the function selector
-    pc calldataload 0xE0 shr                            // [selector]
+    pc calldataload 0xE0 shr                                // [selector]
 
     // If the call has no data, receive()
-    calldatasize iszero receive jumpi                   // [selector]
+    calldatasize iszero rcv jumpi                           // [selector]
 
     // Verify that the caller is the USER
-    caller [USER] eq iszero error jumpi                 // [selector]
+    caller [USER] eq iszero error jumpi                     // [selector]
 
     // Now we can match on selector
-    dup1 __FUNC_SIG(recoverERC20) eq recover jumpi      // [selector]
+    dup1 __FUNC_SIG(recoverERC20) eq recover_erc20 jumpi    // [selector]
+    dup1 __FUNC_SIG(recoverETH) eq recover_eth jumpi        // [selector]
 
-    EXECUTE_SANDWICH()                                  // _stops_
+    EXECUTE_SANDWICH()                                      // _stops_
 
-    error:
-        WAGMI()                                         // _reverts_
-
-    recover:
-        RECOVER_ERC20()                                 // _stops_
+    error: WAGMI()                                          // _reverts_
+    recover_eth: RECOVER_ETH()                              // _stops_
+    recover_erc20: RECOVER_ERC20()                          // _stops_
 
     // Allows the contract to receive ether
-    receive:                                            // [selector]
-        callvalue iszero error jumpi                    // [selector]
-        stop
+    rcv: callvalue iszero error jumpi stop                  // _stops_
 }

@@ -43,7 +43,7 @@ async fn main() -> Result<()> {
 
     // Preload environment variable types
     let _usdc_addr = utils::get_usdc_address()?;
-    let uni_v2_addr = utils::get_univ2_address()?;
+    let uni_v2_addr = utils::get_univ2_router_address();
     let sandwich_contract_address = utils::get_sandwich_contract_address()?;
     let _weth_addr = utils::get_weth_address()?;
     let searcher_wallet = utils::get_searcher_wallet()?;

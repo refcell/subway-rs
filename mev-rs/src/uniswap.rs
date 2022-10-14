@@ -3,14 +3,50 @@
 use ethers::prelude::*;
 use eyre::Result;
 use hex::FromHex;
+use std::str::FromStr;
 
-use crate::utils::get_univ2_factory_address;
+use crate::utils::*;
+use crate::{abi::UniswapV2Pair, prelude::UniswapV2Factory};
 
-/// Sorts two tokens
-pub fn sort_tokens(a: &mut Address, b: &mut Address) {
-    if a > b {
-        std::mem::swap(a, b);
-    }
+/// Returns the Uniswap V2 Pair Contract Address
+///
+/// Although this function unwraps the address conversion, it is safe as the string is checked.
+pub fn get_univ2_router_address() -> Address {
+    Address::from_str("0x7a250d5630b4cf539739df2c5dacb4c659f2488d").unwrap()
+}
+
+/// Returns the Uniswap V2 Factory Address
+///
+/// Although this function unwraps the address conversion, it is safe as the string is checked.
+pub fn get_univ2_factory_address() -> Address {
+    Address::from_str("0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f").unwrap()
+}
+
+/// Construct the Uniswap V2 Pair Contract
+pub fn get_univ2_pair_contract(
+    chain_id: u64,
+    address: &Address,
+) -> Result<UniswapV2Pair<SignerMiddleware<Provider<Http>, LocalWallet>>> {
+    // Create a client
+    let provider = get_http_provider()?;
+    let client = create_http_client(provider, chain_id)?;
+
+    // Return the contract
+    Ok(UniswapV2Pair::new(*address, client))
+}
+
+/// Construct the Uniswap V2 Factory Contract
+pub fn get_univ2_factory_contract(
+) -> Result<UniswapV2Factory<SignerMiddleware<Provider<Http>, LocalWallet>>> {
+    // Create a client
+    let provider = get_http_provider()?;
+    let client = create_http_client(provider, 1)?;
+
+    // Get the factory address
+    let factory_address = get_univ2_factory_address();
+
+    // Return the contract
+    Ok(UniswapV2Factory::new(factory_address, client))
 }
 
 /// Gets the Uniswap V2 Pair Contract Address given two token addresses
@@ -34,7 +70,7 @@ pub fn calculate_uniswap_v2_pair_address(a: &Address, b: &Address) -> Result<Add
 
     // Compute the address with create2
     Ok(ethers::utils::get_create2_address(
-        get_univ2_factory_address()?,
+        get_univ2_factory_address(),
         salt,
         Bytes::from(init_code),
     ))
@@ -43,7 +79,7 @@ pub fn calculate_uniswap_v2_pair_address(a: &Address, b: &Address) -> Result<Add
 /// Gets the Uniswap V2 Pair Contract Address given two token addresses
 pub async fn get_uniswap_v2_pair_address(a: &Address, b: &Address) -> Result<Address> {
     // Get the uniswap v2 factory contract
-    let factory = crate::utils::get_univ2_factory_contract()?;
+    let factory = get_univ2_factory_contract()?;
 
     // Get the pair address
     factory
@@ -55,7 +91,7 @@ pub async fn get_uniswap_v2_pair_address(a: &Address, b: &Address) -> Result<Add
 
 /// Get the Uniswap V2 Reserves for a give token pair
 pub async fn get_uniswap_v2_reserves(pair: &Address) -> Result<(U256, U256)> {
-    let contract = crate::utils::get_univ2_contract(1, pair)?;
+    let contract = get_univ2_pair_contract(1, pair)?;
     let (token_a_reserves, token_b_reserves, _last_time_updated) =
         contract.get_reserves().call().await?;
     Ok((U256::from(token_a_reserves), U256::from(token_b_reserves)))
