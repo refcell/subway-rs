@@ -12,14 +12,11 @@ Construct evm-based sandwich attacks using Rust and Huff.
 > Having highly optimized contracts is just one part of the equation, a tech stack is just as important as the contracts to execute on the opportunities.
 _Source: [libevm/subway](https://github.com/libevm/subway#subway)_
 
-If having a tech stack is just as important as optimized, secure contracts, then why not use the best language available for speed, dependability, and scalability? This is Hugo: A pure-rust bot used to execute sandwich attacks on UniswapV2. Hugo's goal is to act as a low barrier of entry for rust-based MEV development - Reference source code for aspiring new searchers.
+If having a tech stack is just as important as optimized, secure contracts, then why not use the best language available for speed, dependability, and scalability? This is the sandwich-rs bot: A pure-rust bot used to execute sandwich attacks on UniswapV2. The bot's goal is to act as a low barrier of entry for rust-based MEV development - Reference source code for aspiring new searchers.
 
-Hugo is **fast**. But don't take our word for it, just check out the [benchmarks](./hugo/benches).
+It's **fast**. But don't take our word for it, just check out the [benchmarks](./bot/benches).
 
-Alongside [Hugo](./hugo/), we have published [mev-rs](https://crate.io/crates/mev-rs) (the library located in [./mev-rs](./mev-rs/src/lib.rs)): generalized, modular rust infrastructure that you are encouraged to improve upon and extend for your own MEV operations!
-
-
-Hugo is able to:
+Current abilities:
 
 - Watch pending transactions in the mempool.
 - Decode Transaction data for Uniswap V2 Calls. (and more soon!)
@@ -29,9 +26,9 @@ Hugo is able to:
 - Simulate and Execute Flashbot Bundles.
 
 
-### Future Improvements for Hugo
+### Future Improvements
 
-Although the bot functions, it is simplistic and _certainly_ not competitive. Accept that advanced searchers to already be executing far beyond Hugo's capabilities. That being said, below is a non-exhaustive list of low hanging fruit to further Hugo + subway-rs along.
+Although the bot functions, it is simplistic and _certainly_ not competitive. Accept that advanced searchers to already be executing far beyond the current capabilities. That being said, below is a non-exhaustive list of low hanging fruit to further subway-rs along.
 
 - [ ] Deployment logic for contracts
 - [ ] Circuit Breakers
@@ -52,11 +49,7 @@ Again, please be aware, this bot is intended as a piece of educational content, 
 
 ```ml
 .
-├─ cabret — A verbose wallet inspector.
-|  └─ ...
-├─ hugo — A highly optimized, pure rust sandwich bot.
-|  └─ ...
-├─ mev-rs — Modern and maximally-minimal rust tooling for MEV.
+├─ bot — A Highly Optimized Sandwich Bot Built with Pure Rust and Huff.
 |  └─ ...
 └─ contracts — UniswapV2 sandwich attack contracts.
    └─ ...

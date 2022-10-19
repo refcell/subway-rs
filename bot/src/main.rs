@@ -13,7 +13,7 @@ use subway_rs::{abi, banner, numeric, relayer, telemetry, uniswap, utils};
 async fn main() -> Result<()> {
     // Clear the screen and print the banner
     print!("{}[2J", 27 as char);
-    println!("{}", banner::HUGO);
+    println!("{}", banner::SUBWAY);
 
     // Configure Telemetry
     let subscriber = telemetry::get_subscriber("info".into());
@@ -32,7 +32,7 @@ async fn main() -> Result<()> {
         .unwrap()
         .number
         .unwrap();
-    tracing::info!("[START] Hugo initializing on block {}", last_block);
+    tracing::info!("[START] Sandwich bot initializing on block {}", last_block);
 
     // Get the Flashbots Bundle Signer
     let bundle_signer = utils::get_bundle_signer()?;
@@ -42,10 +42,10 @@ async fn main() -> Result<()> {
     );
 
     // Preload environment variable types
-    let _usdc_addr = utils::get_usdc_address()?;
-    let uni_v2_addr = utils::get_univ2_router_address();
+    let _usdc_addr = utils::get_usdc_address();
+    let uni_v2_addr = uniswap::get_univ2_router_address();
     let sandwich_contract_address = utils::get_sandwich_contract_address()?;
-    let _weth_addr = utils::get_weth_address()?;
+    let _weth_addr = utils::get_weth_address();
     let searcher_wallet = utils::get_searcher_wallet()?;
     let searcher_wallet_address = searcher_wallet.address();
     tracing::info!(
@@ -346,10 +346,13 @@ async fn main() -> Result<()> {
         tracing::info!("Signed Transaction!");
 
         // Construct the bundle
-        let bundle =  match relayer::construct_bundle(&signed_transactions, target) {
+        let bundle = match relayer::construct_bundle(&signed_transactions, target) {
             Ok(b) => b,
             Err(e) => {
-                tracing::warn!("[ABORT] Failed to construct flashbots bundle request: {:?}", e);
+                tracing::warn!(
+                    "[ABORT] Failed to construct flashbots bundle request: {:?}",
+                    e
+                );
                 continue;
             }
         };
@@ -357,14 +360,13 @@ async fn main() -> Result<()> {
         tracing::info!("[FLASHBOTS] Constructed Flashbots Bundle Request!");
 
         // Simulate the flashbots bundle
-        let simulated_bundle =
-            match flashbots_client.inner().simulate_bundle(&bundle).await {
-                Ok(sb) => sb,
-                Err(e) => {
-                    tracing::warn!("[ABORT] Failed to simulate flashbots bundle: {:?}", e);
-                    continue;
-                }
-            };
+        let simulated_bundle = match flashbots_client.inner().simulate_bundle(&bundle).await {
+            Ok(sb) => sb,
+            Err(e) => {
+                tracing::warn!("[ABORT] Failed to simulate flashbots bundle: {:?}", e);
+                continue;
+            }
+        };
 
         // Get the gas used from the simulated bundle
         let frontrun_gas = simulated_bundle.transactions[0].gas_used;

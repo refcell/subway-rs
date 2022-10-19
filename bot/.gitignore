@@ -13,15 +13,6 @@ Cargo.lock
 .env
 .env.prod
 
-# Foundry build output
-cache/
-out/
-
 # vscode settings
 .vscode/
 
-# Flattened files
-flattened.txt
-
-# Foundry Scripts
-broadcast
