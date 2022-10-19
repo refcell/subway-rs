@@ -62,6 +62,16 @@ async fn main() -> Result<()> {
 
     // Create transaction stream
     let mut tx_stream = stream.transactions_unordered(usize::MAX);
+    // TODO: Use https://docs.rs/futures/latest/futures/stream/trait.StreamExt.html#method.filter here
+    // let txs = tx_stream.filter(|v| {
+    //     match v {
+    //         Ok(tx) => futures::future::ready(true),
+    //         Err(e) => {
+    //             tracing::warn!("{:?}", e);
+    //             futures::future::ready(false)
+    //         }
+    //     }
+    // });
 
     // Listening to pending transactions
     while let Some(tx) = tx_stream.next().await {
