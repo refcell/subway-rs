@@ -4,6 +4,9 @@
 #![forbid(unsafe_code)]
 #![forbid(where_clauses_object_safety)]
 
+/// A banner
+pub mod banner;
+
 /// A Relayer
 pub mod relayer;
 
@@ -25,5 +28,5 @@ pub mod telemetry;
 
 /// Re-export a prelude
 pub mod prelude {
-    pub use super::{abi::*, numeric::*, relayer::*, uniswap::*, utils::*};
+    pub use super::{abi::*, banner::*, numeric::*, relayer::*, uniswap::*, utils::*};
 }

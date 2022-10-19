@@ -1,25 +1,13 @@
-<img align="right" width="150" height="150" top="100" src="./assets/hugo.png">
+<img align="right" width="150" height="150" top="100" src="./assets/bot.png">
 
-# hugo-rs • [![ci](https://github.com/abigger87/subway-rs/actions/workflows/ci.yaml/badge.svg)](https://github.com/abigger87/subway-rs/actions/workflows/ci.yaml) ![license](https://img.shields.io/badge/License-MIT-green.svg?label=license) ![crates.io](https://img.shields.io/crates/v/hugo-rs)
+# bot • [![ci](https://github.com/abigger87/subway-rs/actions/workflows/ci.yaml/badge.svg)](https://github.com/abigger87/subway-rs/actions/workflows/ci.yaml) ![license](https://img.shields.io/badge/License-MIT-green.svg?label=license)
 
 
-A highly optimized sandwich bot and related infrastructure written in pure rust.
-
+A Highly Optimized Sandwich Bot Built with Pure Rust and Huff.
 
 > **Note**
 >
 > Test in prod. Something, something Zuck, move fast, break things, lose all your ETH.
-
-
-### What is a Hugo?
-
-Hugo is a bot built in rust to sandwich attack Uniswap V2 pairs.
-
-In every Uniswap V2 trade, the user (victim) will specify a minimum amount of output tokens they're willing to receive.
-
-Hugo's (the sandwich bot's) job is to calculate how much of the output tokens they should buy (to push the price of the token up) to match the victim's minimum out requirement. This minimum out requirement on most cases will be 2%, but on extreme cases it can be as high as 20% on volatile pairs (such as the SHIBA-WETH pair during the craze).
-
-Once Hugo has calculated the optimal number of tokens to buy, it'll wait for the victim to buy their tokens, and immediately sell to gain a profit.
 
 
 ### Usage
@@ -47,7 +35,7 @@ SANDWICH_CONTRACT=0x0000000000000000000000000000000000000000
 Then, you can simply run the bot with:
 
 ```bash
-cargo run --bin hugo --release -- --tick-rate 200
+cargo run --bin subway --release
 ```
 
 And you should be good to go!
@@ -55,10 +43,16 @@ And you should be good to go!
 
 ### Blueprint
 
-```ml
+```txt
 .
 ├─ src
-│  └─ lib.rs — Exported modules with a re-exported prelude.
+│  ├─ lib.rs — Exported modules with a re-exported prelude.
+│  ├─ main.rs — The main bot binary.
+│  ├─ numeric.rs — Refactored functions for numeric operations.
+│  ├─ relayer.rs — Wrappers for network requests.
+│  ├─ telemetry.rs — Telemetry for verbose logging.
+│  ├─ uniswap.rs — Uniswap library.
+│  └─ utils.rs — Common utilities.
 └─ tests
    └─ Tests so exhaustive, it'll knock your (uni)-socks off
 ```

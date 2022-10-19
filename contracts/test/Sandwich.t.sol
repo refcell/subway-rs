@@ -14,6 +14,7 @@ import {
 
 interface ISandwich {
     function recoverERC20(address token) external;
+    function recoverETH() external;
 }
 
 contract SandwichTest is Test {
@@ -52,6 +53,24 @@ contract SandwichTest is Test {
         weth.transfer(address(sandwich), 1e18);
     }
 
+    function testRecoverETH() public {
+        // Deal sandwich some eth
+        vm.deal(address(sandwich), 100);
+        vm.deal(address(USER), 1e18);
+
+        // Try to recover eth as a non-user
+        vm.expectRevert();
+        sandwich.recoverETH();
+
+        // The user can recover eth
+        vm.startPrank(USER);
+        sandwich.recoverETH();
+        vm.stopPrank();
+
+        assertEq(address(sandwich).balance, 0);
+        assertEq(USER.balance, 1e18 + 100);
+    }
+
     function testReceive(address caller) public {
         vm.assume(caller != USER);
         vm.startPrank(caller);
@@ -65,6 +84,30 @@ contract SandwichTest is Test {
         (bool s, ) = address(sandwich).call{value: 1}(bytes(""));
         assertTrue(s);
         vm.stopPrank();
+
+        assertEq(caller.balance, 1e18 - 1);
+        assertEq(address(sandwich).balance, 1);
+    }
+
+    function testRecoverERC20(address non_user) public {
+        vm.assume(non_user != USER);
+
+        // Transfer some weth to the sandwich contract
+        // The setup function transfers 1e18 weth to the sandwich contract
+
+        // non-users can't call recoverERC20
+        vm.startPrank(non_user);
+        vm.expectRevert();
+        sandwich.recoverERC20(address(weth));
+        vm.stopPrank();
+
+        // Only the user can recoverERC20
+        vm.startPrank(USER);
+        sandwich.recoverERC20(address(weth));
+        vm.stopPrank();
+
+        assertEq(weth.balanceOf(address(sandwich)), 1);
+        assertEq(weth.balanceOf(USER), 1e18 - 1);
     }
 
     function testOnlyUserCanCallFallback(address caller, bytes memory some) public {
@@ -79,7 +122,6 @@ contract SandwichTest is Test {
 
         // The USER can call the fallback with data
         vm.startPrank(USER);
-        vm.expectRevert("DISPATCH_ERROR");
         address(sandwich).call(abi.encodeWithSignature("recoverERC20()"));
         vm.stopPrank();
     }
