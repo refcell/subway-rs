@@ -2,13 +2,12 @@ name: ci
 
 on: [push]
 
-uses:
-  with:
-    RPC_URL: ${{ secrets.RPC_URL }}
-    RPC_URL_WSS: ${{ secrets.RPC_URL_WSS }}
-    PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
-    FLASHBOTS_AUTH_KEY: ${{ secrets.FLASHBOTS_AUTH_KEY }}
-    SANDWICH_CONTRACT: ${{ secrets.SANDWICH_CONTRACT }}
+env:
+  RPC_URL: ${{ secrets.RPC_URL }}
+  RPC_URL_WSS: ${{ secrets.RPC_URL_WSS }}
+  PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+  FLASHBOTS_AUTH_KEY: ${{ secrets.FLASHBOTS_AUTH_KEY }}
+  SANDWICH_CONTRACT: ${{ secrets.SANDWICH_CONTRACT }}
 
 jobs:
   forge-tests:
