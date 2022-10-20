@@ -4,14 +4,14 @@ use ethers::prelude::*;
 use ethers_flashbots::BundleRequest;
 
 /// Helper function to help catch the various ways errors can be thrown from simulation
-/// This helper function is needed as simulation response has may ways where the
+/// This helper function is needed as simulation response has many ways where the
 /// error can be thrown.... which is not documented
 // pub fn check_simulated_response(sim: &SimulatedBundle) -> eyre::Result<()> {
 //     // TODO::::
 //     Ok(())
 // }
 
-/// Construct a Bundle Request
+/// Construct a Bundle Request for FlashBots
 pub fn construct_bundle(
     signed_transactions: &Vec<Bytes>,
     block_number: U64,
