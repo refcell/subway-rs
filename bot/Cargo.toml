@@ -41,6 +41,7 @@ serde_json = { version = "1.0.82", features = [ "raw_value" ] }
 
 [dev-dependencies]
 tracing-test = "0.2.3"
+criterion = "0.3"
 
 [lib]
 name = "subway_rs"
@@ -50,4 +51,6 @@ path = "src/lib.rs"
 name = "subway"
 path = "src/main.rs"
 
-
+[[bench]]
+name = "uniswap"
+harness = false
