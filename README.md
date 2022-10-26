@@ -56,7 +56,7 @@ Again, please be aware, this bot is intended as a piece of educational content, 
 ```
 
 
-### Acknowledgements
+### Credits & Noteworthy Repositories
 
 - [subway](https://github.com/libevm/subway)
 - [quay](https://github.com/Alcibiades-Capital/quay)
@@ -64,7 +64,9 @@ Again, please be aware, this bot is intended as a piece of educational content, 
 - [foundry](https://github.com/foundry-rs/foundry)
 - [forge-std](https://github.com/brockelmore/forge-std)
 - [foundry-huff](https://github.com/foundry-rs/foundry-huff)
-
+- [searcher-examples](https://github.com/jito-labs/searcher-examples)
+- [simple-arbitrage-rs](https://github.com/thasarito/simple-arbitrage-rs)
+- [mev-bundle-generator](https://github.com/Alcibiades-Capital/mev_bundle_generator)
 
 ### Contributing
 
