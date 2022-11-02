@@ -1,5 +1,5 @@
 use ethers::prelude::*;
-use ethers_flashbots::BundleTransaction;
+use ethers_flashbots::{BundleTransaction, SimulatedBundle, SimulatedTransaction};
 use hex::FromHex;
 use std::str::FromStr;
 
@@ -7,10 +7,75 @@ use subway_rs::relayer;
 
 #[test]
 fn test_validate_simulation_response() {
+    let mut simulated_bundle: SimulatedBundle = SimulatedBundle {
+        hash: H256::from_str("5bc4a7c668569e0a54a23f04afd879f923d60064c10ec2818c351eda3b69d0a8")
+            .unwrap(),
+        coinbase_diff: U256::from_dec_str("1").unwrap(),
+        coinbase_tip: U256::from_dec_str("1").unwrap(),
+        gas_price: U256::from_dec_str("1").unwrap(),
+        gas_used: U256::from_dec_str("1").unwrap(),
+        gas_fees: U256::from_dec_str("1").unwrap(),
+        simulation_block: U64::from(1),
+        transactions: vec![],
+    };
+    assert_eq!(simulated_bundle.effective_gas_price(), U256::from(1));
 
-    // match validate_simulation_response(sb) {
-    //
-    // }
+    // Test validation with successful transactions
+    simulated_bundle.transactions = vec![SimulatedTransaction {
+        hash: H256::from_str("5bc4a7c668569e0a54a23f04afd879f923d60064c10ec2818c351eda3b69d0a8")
+            .unwrap(),
+        coinbase_diff: U256::from_dec_str("1").unwrap(),
+        coinbase_tip: U256::from_dec_str("1").unwrap(),
+        gas_price: U256::from_dec_str("1").unwrap(),
+        gas_used: U256::from_dec_str("1").unwrap(),
+        gas_fees: U256::from_dec_str("1").unwrap(),
+        from: Address::from_str("0x6d51e250434a2b37e391c445c42f19c53c6bbdb4").unwrap(),
+        to: Some(Address::from_str("0x6d51e250434a2b37e391c445c42f19c53c6bbdb4").unwrap()),
+        value: None,
+        error: None,
+        revert: None,
+    }];
+    let _ = relayer::validate_simulation_response(&simulated_bundle).unwrap();
+
+    // Test validation with error transaction
+    simulated_bundle.transactions = vec![SimulatedTransaction {
+        hash: H256::from_str("5bc4a7c668569e0a54a23f04afd879f923d60064c10ec2818c351eda3b69d0a8")
+            .unwrap(),
+        coinbase_diff: U256::from_dec_str("1").unwrap(),
+        coinbase_tip: U256::from_dec_str("1").unwrap(),
+        gas_price: U256::from_dec_str("1").unwrap(),
+        gas_used: U256::from_dec_str("1").unwrap(),
+        gas_fees: U256::from_dec_str("1").unwrap(),
+        from: Address::from_str("0x6d51e250434a2b37e391c445c42f19c53c6bbdb4").unwrap(),
+        to: Some(Address::from_str("0x6d51e250434a2b37e391c445c42f19c53c6bbdb4").unwrap()),
+        value: None,
+        error: Some(String::from("500: Internal Flashbots Relay Error")),
+        revert: None,
+    }];
+    match relayer::validate_simulation_response(&simulated_bundle) {
+        Ok(_) => panic!("Expected validation error for simulated bundle!"),
+        Err(_) => {}
+    }
+
+    // Test validation with reverting transaction
+    simulated_bundle.transactions = vec![SimulatedTransaction {
+        hash: H256::from_str("5bc4a7c668569e0a54a23f04afd879f923d60064c10ec2818c351eda3b69d0a8")
+            .unwrap(),
+        coinbase_diff: U256::from_dec_str("1").unwrap(),
+        coinbase_tip: U256::from_dec_str("1").unwrap(),
+        gas_price: U256::from_dec_str("1").unwrap(),
+        gas_used: U256::from_dec_str("1").unwrap(),
+        gas_fees: U256::from_dec_str("1").unwrap(),
+        from: Address::from_str("0x6d51e250434a2b37e391c445c42f19c53c6bbdb4").unwrap(),
+        to: Some(Address::from_str("0x6d51e250434a2b37e391c445c42f19c53c6bbdb4").unwrap()),
+        value: None,
+        error: None,
+        revert: Some(String::from("Revert: Arithmetic Overflow/Underflow")),
+    }];
+    match relayer::validate_simulation_response(&simulated_bundle) {
+        Ok(_) => panic!("Expected validation error for simulated bundle!"),
+        Err(_) => {}
+    }
 }
 
 #[test]

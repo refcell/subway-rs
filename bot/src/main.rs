@@ -379,7 +379,7 @@ async fn main() -> Result<()> {
         };
 
         // Validate the simulation response
-        if let Err(e) = validate_simulation_response(simulated_bundle) {
+        if let Err(e) = relayer::validate_simulation_response(&simulated_bundle) {
             tracing::warn!("[SIM] Simulation Validation Failed: {:?}", e);
             continue;
         }
