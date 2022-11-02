@@ -152,7 +152,13 @@ pub fn binary_search(
         .map(|v| if v > base { base } else { v })
         .unwrap_or_else(|| U256::from(100u64));
 
-    if (upper_bound - lower_bound) > ((tolerance * ((upper_bound + lower_bound) / 2)) / base) {
+    // The delta cannot be 0 or we will stack overflow
+    let spread = upper_bound - lower_bound;
+    let delta = (tolerance * ((upper_bound + lower_bound) / 2)) / base;
+    let delta = if delta.is_zero() { U256::one() } else { delta };
+
+    // Step
+    if spread > delta {
         let mid = (upper_bound + lower_bound) / 2;
         let out = calculation(mid);
 
