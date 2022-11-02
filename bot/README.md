@@ -2,13 +2,11 @@
 
 # bot • [![ci](https://github.com/abigger87/subway-rs/actions/workflows/ci.yaml/badge.svg)](https://github.com/abigger87/subway-rs/actions/workflows/ci.yaml) ![license](https://img.shields.io/badge/License-MIT-green.svg?label=license)
 
-
 A Highly Optimized Sandwich Bot Built with Pure Rust and Huff.
 
 > **Note**
 >
 > Test in prod. Something, something Zuck, move fast, break things, lose all your ETH.
-
 
 ### Usage
 
@@ -40,6 +38,13 @@ cargo run --bin subway --release
 
 And you should be good to go!
 
+**Benchmarks**
+
+To run benchmarks, simply run:
+
+```bash
+cargo bench
+```
 
 ### Blueprint
 
@@ -56,7 +61,6 @@ And you should be good to go!
 └─ tests
    └─ Tests so exhaustive, it'll knock your (uni)-socks off
 ```
-
 
 ### Credits
 
