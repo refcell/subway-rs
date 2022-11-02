@@ -60,3 +60,7 @@ harness = false
 [[bench]]
 name = "utils"
 harness = false
+
+[[bench]]
+name = "relayer"
+harness = false

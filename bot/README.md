@@ -6,7 +6,10 @@ A Highly Optimized Sandwich Bot Built with Pure Rust and Huff.
 
 > **Note**
 >
-> Test in prod. Something, something Zuck, move fast, break things, lose all your ETH.
+> Test in prod
+> something Zuck Gobble Fast
+> lose all your ETH
+> i accidentally broke it
 
 ### Usage
 
@@ -45,6 +48,8 @@ To run benchmarks, simply run:
 ```bash
 cargo bench
 ```
+
+Individual benches can be run by supplying the `--bench` flag to cargo with the benchmark name. (e.g. `cargo bench --bench utils`)
 
 ### Blueprint
 
