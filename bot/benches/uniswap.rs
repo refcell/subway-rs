@@ -2,7 +2,7 @@ use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion};
 use ethers::prelude::*;
 use subway_rs::uniswap::*;
 
-use criterion::async_executor::FuturesExecutor;
+use tokio::runtime;
 
 fn bench_univ2_router_address(c: &mut Criterion) {
     c.bench_function("uniswap v2 router", |b| {
@@ -28,30 +28,36 @@ fn bench_get_uniswap_v2_pair_address(c: &mut Criterion) {
     let addr_a = Address::random();
     let addr_b = Address::random();
     c.bench_function("uniswap v2 factory", |b| {
-        b.to_async(FuturesExecutor)
+        let rt = runtime::Builder::new_multi_thread()
+            .enable_all()
+            .build()
+            .unwrap();
+        b.to_async(rt)
             .iter(|| get_uniswap_v2_pair_address(&addr_a, &addr_b))
     });
 }
 
 fn bench_pair_addresses(c: &mut Criterion) {
     let mut group = c.benchmark_group("UniswapPairAddressRetrievers");
-    for i in 0..100u64 {
-        let addr_a = Address::random();
-        let addr_b = Address::random();
-        group.bench_with_input(
-            BenchmarkId::new("Calculated", &i),
-            &(&addr_a, &addr_b),
-            |b, (aa, ab)| b.iter(|| calculate_uniswap_v2_pair_address(aa, ab)),
-        );
-        group.bench_with_input(
-            BenchmarkId::new("Fetched", i),
-            &(&addr_a, &addr_b),
-            |b, (aa, ab)| {
-                b.to_async(FuturesExecutor)
-                    .iter(|| get_uniswap_v2_pair_address(aa, ab))
-            },
-        );
-    }
+    let addr_a = Address::random();
+    let addr_b = Address::random();
+    let i = 1u64;
+    group.bench_with_input(
+        BenchmarkId::new("Calculated", &i),
+        &(&addr_a, &addr_b),
+        |b, (aa, ab)| b.iter(|| calculate_uniswap_v2_pair_address(aa, ab)),
+    );
+    group.bench_with_input(
+        BenchmarkId::new("Fetched", i),
+        &(&addr_a, &addr_b),
+        |b, (aa, ab)| {
+            let rt = runtime::Builder::new_multi_thread()
+                .enable_all()
+                .build()
+                .unwrap();
+            b.to_async(rt).iter(|| get_uniswap_v2_pair_address(aa, ab));
+        },
+    );
     group.finish();
 }
 
