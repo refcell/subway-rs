@@ -14,7 +14,7 @@ eyre = { version = "0.6" }
 thiserror = "1.0.31"
 
 # Core
-tokio = { version = "1.0.1", features = ["rt-multi-thread", "macros"] }
+tokio = { version = "1.0.1", features = ["full"] }
 ethers = { version = "0.17.0", features = [ "abigen", "ws", "rustls" ] }
 ethers-flashbots = "0.10.0"
 
@@ -43,6 +43,7 @@ serde_json = { version = "1.0.82", features = [ "raw_value" ] }
 tracing-test = "0.2.3"
 criterion = { version = "0.4", features = [ "async_futures", "plotters" ]}
 plotters = "0.3.3"
+async-std = { version = "1.12.0", features = [ "tokio1", "attributes" ] }
 
 [lib]
 name = "subway_rs"
@@ -54,10 +55,8 @@ path = "src/main.rs"
 
 [[bench]]
 name = "uniswap"
-html_reports = true
 harness = false
 
 [[bench]]
 name = "utils"
-html_reports = true
 harness = false

@@ -60,14 +60,14 @@ pub fn calculate_uniswap_v2_pair_address(a: &Address, b: &Address) -> Result<Add
     let mut data = [0u8; 40];
     data[0..20].copy_from_slice(tokens[0].as_bytes());
     data[20..].copy_from_slice(tokens[1].as_bytes());
-    println!("Non packed: {:?}", data);
-    println!("Encoded tokens: {:?}", data.clone().encode_hex());
+    // println!("Non packed: {:?}", data);
+    // println!("Encoded tokens: {:?}", data.clone().encode_hex());
 
     let packed =
         <[u8; 40]>::from_hex(format!("{:?}{:?}", tokens[0], tokens[1]).replacen("0x", "", 2))
             .map_err(|_| eyre::eyre!("Failed to parse tokens as hex"))?;
-    println!("Packed {:?}", packed);
-    println!("Packed hex: {:?}", packed.encode_hex());
+    // println!("Packed {:?}", packed);
+    // println!("Packed hex: {:?}", packed.encode_hex());
 
     // Hash the concatenated token address bytes
     let salt = ethers::utils::keccak256(data);
@@ -79,8 +79,8 @@ pub fn calculate_uniswap_v2_pair_address(a: &Address, b: &Address) -> Result<Add
     // ]);
     // println!("Encoded tokens: {:?}", encoded_tokens.clone().encode_hex());
     // let salt = ethers::utils::keccak256(encoded_tokens);
-    println!("Hashed tokens: {:?}", salt);
-    println!("Hashed tokens as hex: {:?}", salt.encode_hex());
+    // println!("Hashed tokens: {:?}", salt);
+    // println!("Hashed tokens as hex: {:?}", salt.encode_hex());
     // let salt = hex::decode(data.encode_hex())
     //    .map_err(|_| eyre::eyre!("Failed to encode tokens to keccak256 encoded bytes"))?;
 
@@ -90,11 +90,11 @@ pub fn calculate_uniswap_v2_pair_address(a: &Address, b: &Address) -> Result<Add
             .map_err(|_| eyre::eyre!("Invalid init code hex"))?;
     //let init_code = hex::decode("96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f")
     //    .map_err(|_| eyre::eyre!("Invalid init code hex"))?;
-    println!("Init code as hex: {:?}", init_code.clone().encode_hex());
+    // println!("Init code as hex: {:?}", init_code.clone().encode_hex());
 
     // Get the uniswap factory address
     let factory = get_univ2_factory_address();
-    println!("Factory: {:?}", factory);
+    // println!("Factory: {:?}", factory);
 
     // Compute the address with create2
     Ok(ethers::utils::get_create2_address(factory, salt, init_code))
