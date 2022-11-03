@@ -49,6 +49,7 @@ jobs:
       - name: Check contract sizes
         run: forge build --sizes
       - name: Check gas snapshots
+        continue-on-error: true
         run: forge snapshot --check
   huff-tests:
     runs-on: ubuntu-latest
