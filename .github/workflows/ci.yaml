@@ -30,6 +30,7 @@ jobs:
   forge-snapshot:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    continue-on-error: true
     defaults:
       run:
         working-directory: ./contracts
