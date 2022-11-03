@@ -54,10 +54,12 @@ async fn main() -> Result<()> {
     );
 
     // Create pending stream
-    let stream = if let Ok(c) = client.watch_pending_transactions().await {
-        c
-    } else {
-        panic!("Failed to create filter watcher for pending transactions!");
+    let stream = match client.watch_pending_transactions().await {
+        Ok(c) => c,
+        Err(e) => {
+            eprintln!("{:?}", e);
+            panic!("Failed to create filter watcher for pending transactions!");
+        }
     };
 
     // Create transaction stream
