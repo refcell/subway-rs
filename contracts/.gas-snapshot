@@ -1,0 +1,5 @@
+SandwichTest:testOnlyUserCanCallFallback(address,bytes) (runs: 256, μ: 17685, ~: 17641)
+SandwichTest:testReceive(address) (runs: 256, μ: 17952, ~: 17952)
+SandwichTest:testRecoverERC20(address) (runs: 256, μ: 48827, ~: 48827)
+SandwichTest:testRecoverETH() (gas: 15355)
+SandwichTest:testSandwichFrontslice() (gas: 121996)
