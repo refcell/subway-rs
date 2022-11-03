@@ -3,7 +3,7 @@
 use ethers::{prelude::*, utils::parse_ether};
 use serde::{Deserialize, Serialize};
 
-use crate::prelude::get_univ2_data_given_in;
+use crate::uniswap;
 
 /// Calculate the max sandwich amount
 pub fn calculate_sandwich_optimal_in(
@@ -18,9 +18,9 @@ pub fn calculate_sandwich_optimal_in(
 
     let calculation = move |amount_in: U256| -> U256 {
         let (_, new_a_reserves, new_b_reserves) =
-            get_univ2_data_given_in(&amount_in, weth_reserves, token_reserves);
+            uniswap::get_univ2_data_given_in(&amount_in, weth_reserves, token_reserves);
         let (amount_out, _, _) =
-            get_univ2_data_given_in(user_amount_in, &new_a_reserves, &new_b_reserves);
+            uniswap::get_univ2_data_given_in(user_amount_in, &new_a_reserves, &new_b_reserves);
         amount_out
     };
 
@@ -91,10 +91,10 @@ pub fn calculate_sandwich_context(
 ) -> eyre::Result<SandwichContext> {
     // Calculate the frontrun state
     let frontrun_state: PoolState =
-        get_univ2_data_given_in(optimal_weth_in, weth_reserves, token_reserves).into();
+        uniswap::get_univ2_data_given_in(optimal_weth_in, weth_reserves, token_reserves).into();
 
     // Calculate the target state
-    let target_state: PoolState = get_univ2_data_given_in(
+    let target_state: PoolState = uniswap::get_univ2_data_given_in(
         user_amount_in,
         &frontrun_state.new_a_reserves,
         &frontrun_state.new_b_reserves,
@@ -102,10 +102,10 @@ pub fn calculate_sandwich_context(
     .into();
 
     // Calculate the backrun state
-    let backrun_state: PoolState = get_univ2_data_given_in(
+    let backrun_state: PoolState = uniswap::get_univ2_data_given_in(
         &frontrun_state.variable,
-        &target_state.new_a_reserves,
         &target_state.new_b_reserves,
+        &target_state.new_a_reserves,
     )
     .into();
 

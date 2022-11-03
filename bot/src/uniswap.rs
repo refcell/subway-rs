@@ -1,6 +1,6 @@
 //! Uniswap Utilities
 
-use ethers::abi::AbiEncode;
+// use ethers::abi::AbiEncode;
 use ethers::prelude::*;
 use eyre::Result;
 use hex::FromHex;
@@ -63,9 +63,9 @@ pub fn calculate_uniswap_v2_pair_address(a: &Address, b: &Address) -> Result<Add
     // println!("Non packed: {:?}", data);
     // println!("Encoded tokens: {:?}", data.clone().encode_hex());
 
-    let packed =
-        <[u8; 40]>::from_hex(format!("{:?}{:?}", tokens[0], tokens[1]).replacen("0x", "", 2))
-            .map_err(|_| eyre::eyre!("Failed to parse tokens as hex"))?;
+    // let packed =
+    //     <[u8; 40]>::from_hex(format!("{:?}{:?}", tokens[0], tokens[1]).replacen("0x", "", 2))
+    //         .map_err(|_| eyre::eyre!("Failed to parse tokens as hex"))?;
     // println!("Packed {:?}", packed);
     // println!("Packed hex: {:?}", packed.encode_hex());
 
