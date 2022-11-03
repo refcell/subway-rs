@@ -41,6 +41,15 @@ cargo run --bin subway --release
 
 And you should be good to go!
 
+**Library Usage**
+
+To use as a library, add subway-rs as a dependency in your `Cargo.toml`:
+
+```toml
+[dependencies]
+subway-rs = "0.5.0"
+```
+
 **Benchmarks**
 
 To run benchmarks, simply run:
