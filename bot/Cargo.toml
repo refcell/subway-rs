@@ -14,7 +14,8 @@ eyre = { version = "0.6" }
 thiserror = "1.0.31"
 
 # Core
-tokio = { version = "1.0.1", features = ["rt-multi-thread", "macros"] }
+tokio = { version = "1.0.1", features = ["full"] }
+# ethers = { git = "https://github.com/gakonst/ethers-rs", features = [ "abigen", "ws", "rustls" ] }
 ethers = { version = "0.17.0", features = [ "abigen", "ws", "rustls" ] }
 ethers-flashbots = "0.10.0"
 
@@ -41,6 +42,9 @@ serde_json = { version = "1.0.82", features = [ "raw_value" ] }
 
 [dev-dependencies]
 tracing-test = "0.2.3"
+criterion = { version = "0.4", features = [ "async_tokio", "plotters" ]}
+plotters = "0.3.3"
+
 
 [lib]
 name = "subway_rs"
@@ -50,4 +54,14 @@ path = "src/lib.rs"
 name = "subway"
 path = "src/main.rs"
 
+[[bench]]
+name = "uniswap"
+harness = false
 
+[[bench]]
+name = "utils"
+harness = false
+
+[[bench]]
+name = "relayer"
+harness = false

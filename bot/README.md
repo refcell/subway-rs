@@ -2,13 +2,14 @@
 
 # bot • [![ci](https://github.com/abigger87/subway-rs/actions/workflows/ci.yaml/badge.svg)](https://github.com/abigger87/subway-rs/actions/workflows/ci.yaml) ![license](https://img.shields.io/badge/License-MIT-green.svg?label=license)
 
-
 A Highly Optimized Sandwich Bot Built with Pure Rust and Huff.
 
 > **Note**
 >
-> Test in prod. Something, something Zuck, move fast, break things, lose all your ETH.
-
+> Test in prod
+> something Zuck Gobble Fast
+> lose all your ETH
+> i accidentally broke it
 
 ### Usage
 
@@ -26,7 +27,7 @@ Required Preparation:
 
 ```ignore
 RPC_URL=http://127.0.0.1:8545
-RPC_URL_WSS=ws://127.0.0.1:8546
+RPC_URL_WSS=ws://127.0.0.1:8545
 PRIVATE_KEY=0000000000000000000000000000000000000000000000000000000000000001
 FLASHBOTS_AUTH_KEY=0000000000000000000000000000000000000000000000000000000000000002
 SANDWICH_CONTRACT=0x0000000000000000000000000000000000000000
@@ -40,6 +41,15 @@ cargo run --bin subway --release
 
 And you should be good to go!
 
+**Benchmarks**
+
+To run benchmarks, simply run:
+
+```bash
+cargo bench
+```
+
+Individual benches can be run by supplying the `--bench` flag to cargo with the benchmark name. (e.g. `cargo bench --bench utils`)
 
 ### Blueprint
 
@@ -56,7 +66,6 @@ And you should be good to go!
 └─ tests
    └─ Tests so exhaustive, it'll knock your (uni)-socks off
 ```
-
 
 ### Credits
 

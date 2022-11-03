@@ -1,17 +1,15 @@
 name: ci
-
 on: [push]
-
 env:
   RPC_URL: ${{ secrets.RPC_URL }}
   RPC_URL_WSS: ${{ secrets.RPC_URL_WSS }}
   PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
   FLASHBOTS_AUTH_KEY: ${{ secrets.FLASHBOTS_AUTH_KEY }}
   SANDWICH_CONTRACT: ${{ secrets.SANDWICH_CONTRACT }}
-
 jobs:
   forge-tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     defaults:
       run:
         working-directory: ./contracts
@@ -29,9 +27,9 @@ jobs:
           version: nightly
       - name: Run Tests
         run: forge test -vvv
-
   forge-snapshot:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     defaults:
       run:
         working-directory: ./contracts
@@ -51,9 +49,9 @@ jobs:
         run: forge build --sizes
       - name: Check gas snapshots
         run: forge snapshot --check
-
   huff-tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     defaults:
       run:
         working-directory: ./contracts
@@ -74,10 +72,8 @@ jobs:
         with:
           with-forge-tests: false
           test-extension: ".t.huff"
-
   forge-scripts:
-    strategy:
-      fail-fast: true
+    timeout-minutes: 20
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -107,9 +103,9 @@ jobs:
           for file in script/*; do
             forge script $file -vvvv
           done
-
   cargo-tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     defaults:
       run:
         working-directory: ./bot
@@ -131,9 +127,9 @@ jobs:
           version: nightly
       - name: cargo test
         run: cargo test --all --all-features
-
   cargo-lint:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     defaults:
       run:
         working-directory: ./bot
@@ -154,9 +150,9 @@ jobs:
         run: cargo +nightly fmt --all -- --check
       - name: cargo clippy
         run: cargo +nightly clippy --all --all-features -- -D warnings
-
   cargo-build:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     continue-on-error: true
     defaults:
       run:
@@ -177,3 +173,26 @@ jobs:
         id: build
         continue-on-error: true
         run: cargo +nightly build --all
+  cargo-bench:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    continue-on-error: true
+    defaults:
+      run:
+        working-directory: ./bot
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+      - name: Install toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+      - uses: Swatinem/rust-cache@v1
+        with:
+          cache-on-failure: true
+      - name: build
+        id: build
+        continue-on-error: true
+        run: cargo +nightly bench --all

@@ -54,10 +54,12 @@ async fn main() -> Result<()> {
     );
 
     // Create pending stream
-    let stream = if let Ok(c) = client.watch_pending_transactions().await {
-        c
-    } else {
-        panic!("Failed to create filter watcher for pending transactions!");
+    let stream = match client.watch_pending_transactions().await {
+        Ok(c) => c,
+        Err(e) => {
+            eprintln!("{:?}", e);
+            panic!("Failed to create filter watcher for pending transactions!");
+        }
     };
 
     // Create transaction stream
@@ -356,7 +358,7 @@ async fn main() -> Result<()> {
         tracing::info!("Signed Transaction!");
 
         // Construct the bundle
-        let bundle = match relayer::construct_bundle(&signed_transactions, target) {
+        let bundle = match relayer::construct_bundle(signed_transactions, target) {
             Ok(b) => b,
             Err(e) => {
                 tracing::warn!(
@@ -378,6 +380,12 @@ async fn main() -> Result<()> {
             }
         };
 
+        // Validate the simulation response
+        if let Err(e) = relayer::validate_simulation_response(&simulated_bundle) {
+            tracing::warn!("[SIM] Simulation Validation Failed: {:?}", e);
+            continue;
+        }
+
         // Get the gas used from the simulated bundle
         let frontrun_gas = simulated_bundle.transactions[0].gas_used;
         let backrun_gas = simulated_bundle.transactions[2].gas_used;
@@ -395,8 +403,7 @@ async fn main() -> Result<()> {
         let bribe_amount = sandwich_context.revenue - frontrun_gas * next_base_fee;
         let max_priority_fee_per_gas = ((bribe_amount * 1337) / 10_000) / backrun_gas;
 
-        // Note: you probably want some circuit breakers here so you don't lose money
-        // if you fudged shit up
+        // Note: you probably want circuit breakers here so you don't lose money if you fucked shit up
 
         // If 99.99% bribe isn't enough to cover base fee, its not worth it
         if max_priority_fee_per_gas < next_base_fee {
