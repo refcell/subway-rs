@@ -57,7 +57,7 @@ async fn main() -> Result<()> {
     let stream = match client.watch_pending_transactions().await {
         Ok(c) => c,
         Err(e) => {
-            eprintln!("{:?}", e);
+            eprintln!("{e:?}");
             panic!("Failed to create filter watcher for pending transactions!");
         }
     };

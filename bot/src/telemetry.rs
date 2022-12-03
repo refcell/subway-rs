@@ -11,23 +11,23 @@ pub struct AnsiVisitor;
 
 impl tracing::field::Visit for AnsiVisitor {
     fn record_f64(&mut self, _: &tracing::field::Field, value: f64) {
-        println!("{}", value)
+        println!("{value}")
     }
 
     fn record_i64(&mut self, _: &tracing::field::Field, value: i64) {
-        println!("{}", value)
+        println!("{value}")
     }
 
     fn record_u64(&mut self, _: &tracing::field::Field, value: u64) {
-        println!("{}", value)
+        println!("{value}")
     }
 
     fn record_bool(&mut self, _: &tracing::field::Field, value: bool) {
-        println!("{}", value)
+        println!("{value}")
     }
 
     fn record_str(&mut self, _: &tracing::field::Field, value: &str) {
-        println!("{}", value)
+        println!("{value}")
     }
 
     fn record_error(
@@ -35,11 +35,11 @@ impl tracing::field::Visit for AnsiVisitor {
         _: &tracing::field::Field,
         value: &(dyn std::error::Error + 'static),
     ) {
-        println!("{}", value)
+        println!("{value}")
     }
 
     fn record_debug(&mut self, _: &tracing::field::Field, value: &dyn std::fmt::Debug) {
-        println!("{:?}", value)
+        println!("{value:?}")
     }
 }
 
