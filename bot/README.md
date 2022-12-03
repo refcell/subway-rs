@@ -1,6 +1,6 @@
 <img align="right" width="150" height="150" top="100" src="./assets/bot.png">
 
-# bot • [![ci](https://github.com/abigger87/subway-rs/actions/workflows/ci.yaml/badge.svg)](https://github.com/abigger87/subway-rs/actions/workflows/ci.yaml) ![license](https://img.shields.io/badge/License-MIT-green.svg?label=license)
+# bot • [![ci](https://github.com/refcell/subway-rs/actions/workflows/ci.yaml/badge.svg)](https://github.com/refcell/subway-rs/actions/workflows/ci.yaml) ![license](https://img.shields.io/badge/License-MIT-green.svg?label=license)
 
 A Highly Optimized Sandwich Bot Built with Pure Rust and Huff.
 

@@ -1,6 +1,6 @@
 <img align="right" width="150" height="150" top="100" src="./assets/plate.png">
 
-# subway-rs/contracts • [![ci](https://github.com/abigger87/subway-rs/actions/workflows/ci.yaml/badge.svg)](https://github.com/abigger87/subway-rs/actions/workflows/ci.yaml) ![license](https://img.shields.io/badge/License-MIT-green.svg?label=license) ![solidity](https://img.shields.io/badge/solidity-^0.8.15-lightgrey) ![huff](https://img.shields.io/badge/huff-0.3.0-8b6c5c)
+# subway-rs/contracts • [![ci](https://github.com/refcell/subway-rs/actions/workflows/ci.yaml/badge.svg)](https://github.com/refcell/subway-rs/actions/workflows/ci.yaml) ![license](https://img.shields.io/badge/License-MIT-green.svg?label=license) ![solidity](https://img.shields.io/badge/solidity-^0.8.15-lightgrey) ![huff](https://img.shields.io/badge/huff-0.3.0-8b6c5c)
 
 A highly optimized [huff](https://github.com/huff-language) contract that can be used for front and back slices in a UniswapV2 [sandwich attack](https://medium.com/coinmonks/defi-sandwich-attack-explain-776f6f43b2fd).
 
@@ -41,7 +41,7 @@ _Just Use [Foundry](https://getfoundry.sh)._
 ### Acknowledgements
 
 - [subway](https://github.com/libevm/subway)
-- [huffplate](https://github.com/abigger87/huffplate)
+- [huffplate](https://github.com/refcell/huffplate)
 - [huff-language](https://github.com/huff-language)
 - [forge-std](https://github.com/brockelmore/forge-std)
 - [forge-template](https://github.com/foundry-rs/forge-template)

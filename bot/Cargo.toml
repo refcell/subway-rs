@@ -4,8 +4,8 @@ version = "0.5.1"
 edition = "2021"
 license = "MIT"
 description = "A Highly Optimized Sandwich Bot Built with Pure Rust and Huff"
-authors = ["asnared <https://github.com/abigger87>"]
-repository = "https://github.com/abigger87/subway-rs"
+authors = ["asnared <https://github.com/refcell>"]
+repository = "https://github.com/refcell/subway-rs"
 keywords = ["Rust", "Ethereum", "Arbitrage", "Sandwich"]
 
 [dependencies]
