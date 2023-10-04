@@ -1,7 +1,7 @@
 //! A module containing common utilities
 
 use std::{str::FromStr, sync::Arc};
-
+use dotenv::dotenv; // read .env files
 use ethers::{prelude::*, types::transaction::eip2718::TypedTransaction};
 use eyre::Result;
 use rand::Rng;
@@ -16,6 +16,7 @@ pub fn sort_tokens(a: &mut Address, b: &mut Address) {
 /// Returns the WETH Contract Address
 ///
 /// Although this function unwraps the address conversion, it is safe as the string is checked.
+/// Edit this address to match the one on the chain you're operating on
 pub fn get_weth_address() -> Address {
     Address::from_str("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2").unwrap()
 }
@@ -23,6 +24,7 @@ pub fn get_weth_address() -> Address {
 /// Returns the usdc Contract Address
 ///
 /// Although this function unwraps the address conversion, it is safe as the string is checked.
+/// Edit this address to match the one on the chain you're operating on
 pub fn get_usdc_address() -> Address {
     Address::from_str("0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48").unwrap()
 }
@@ -69,12 +71,13 @@ pub fn calculate_next_block_base_fee(block: Block<TxHash>) -> eyre::Result<U256>
 
 /// Read environment variables
 pub fn read_env_vars() -> Result<Vec<(String, String)>> {
+    dotenv().ok(); // read .env file
     let mut env_vars = Vec::new();
     let keys = vec![
         "RPC_URL",
         "RPC_URL_WSS",
-        "PRIVATE_KEY",
-        "FLASHBOTS_AUTH_KEY",
+        "PRIVATE_KEY", // remove the 0x from the key in the .env file
+        "FLASHBOTS_AUTH_KEY", // remove the 0x from the key in the .env file
         "SANDWICH_CONTRACT",
     ];
     for key in keys {
@@ -88,6 +91,7 @@ pub fn read_env_vars() -> Result<Vec<(String, String)>> {
 
 /// Returns the configured Sandwich Contract Address
 pub fn get_sandwich_contract_address() -> Result<Address> {
+    dotenv().ok(); // read .env
     let addr = std::env::var("SANDWICH_CONTRACT")
         .map_err(|_| eyre::eyre!("Required environment variable \"SANDWICH_CONTRACT\" not set"))?;
     Address::from_str(&addr).map_err(|_| eyre::eyre!("Invalid address \"{}\"", addr))
@@ -95,6 +99,7 @@ pub fn get_sandwich_contract_address() -> Result<Address> {
 
 /// Return a Provider for the given URL
 pub fn get_http_provider() -> Result<Provider<Http>> {
+    dotenv().ok(); // read .env
     let url = std::env::var("RPC_URL")
         .map_err(|_| eyre::eyre!("Required environment variable \"RPC_URL\" not set"))?;
     Provider::<Http>::try_from(url).map_err(|_| eyre::eyre!("Invalid RPC URL"))
@@ -102,6 +107,7 @@ pub fn get_http_provider() -> Result<Provider<Http>> {
 
 /// Return a Provider for the given Websocket URL
 pub async fn get_ws_provider() -> Result<Provider<Ws>> {
+    dotenv().ok(); // read .env
     let url = std::env::var("RPC_URL_WSS")
         .map_err(|_| eyre::eyre!("Required environment variable \"RPC_URL_WSS\" not set"))?;
     Provider::<Ws>::connect(&url)
@@ -117,6 +123,7 @@ pub async fn create_websocket_client() -> Result<Arc<Provider<Ws>>> {
 
 /// Construct the searcher wallet
 pub fn get_searcher_wallet() -> Result<LocalWallet> {
+    dotenv().ok(); // read .env
     let private_key = std::env::var("PRIVATE_KEY")
         .map_err(|_| eyre::eyre!("Required environment variable \"PRIVATE_KEY\" not set"))?;
     private_key
@@ -127,6 +134,7 @@ pub fn get_searcher_wallet() -> Result<LocalWallet> {
 /// Construct the bundle signer
 /// This is your flashbots searcher identity
 pub fn get_bundle_signer() -> Result<LocalWallet> {
+    dotenv().ok(); // read .env
     let private_key = std::env::var("FLASHBOTS_AUTH_KEY")
         .map_err(|_| eyre::eyre!("Required environment variable \"FLASHBOTS_AUTH_KEY\" not set"))?;
     private_key
