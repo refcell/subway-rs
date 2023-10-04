@@ -6,6 +6,8 @@ Construct evm-based sandwich attacks using Rust and Huff.
 
 #### Getting Started
 
+> Before going further you should have the following packages installed on your system: Yarn, Cargo, Rust, Forge, Huff Compiler, Solc=0.8.15
+
 [subway-rs](https://github.com/refcell/subway-rs) is a port of [libevm](https://twitter.com/libevm)'s original [subway](https://github.com/libevm/subway), implemented with [ethers-rs](https://github.com/gakonst/ethers-rs) and [huff](https://github.com/huff-language).
 
 > Having highly optimized contracts is just one part of the equation, a tech stack is just as important as the contracts to execute on the opportunities.
